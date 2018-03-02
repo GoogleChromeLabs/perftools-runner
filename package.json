@@ -1,0 +1,23 @@
+{
+  "name": "lighthouse-and-friends",
+  "version": "1.0.0",
+  "author": "Eric Bidelman <ebidel@>",
+  "description": "Big Lightouse and friends demo",
+  "main": "server.mjs",
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "start": "node --experimental-modules server.mjs"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "lighthouse": "^2.9.1",
+    "lit-html": "^0.9.0",
+    "puppeteer": "^1.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.1",
+    "eslint-config-google": "^0.9.1"
+  }
+}

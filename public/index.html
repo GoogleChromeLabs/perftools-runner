@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Lighthouse &amp; Friends</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:400,500">
+  <meta name="theme-color" content="#37474F">
+  <meta name="author" content="Eric Bidelman">
+  <!-- <link rel="icon" sizes="192x192" href="img/firehose.png"> -->
+  <!-- <link rel="shortcut icon" href="img/firehose.png"> -->
+  <link rel="shortcut icon" href="https://developers.google.com/_static/images/favicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<main class="layout vertical center-center">
+  <header>
+    <h1>Take our performance tools for a spin</h1>
+  </header>
+  <div id="tools" class="layout">
+    <div class="tool"></div>
+    <div class="tool"></div>
+    <div class="tool"></div>
+    <div class="tool"></div>
+    <div class="tool"></div>
+  </div>
+</main>
+
+<div class="overlay layout vertical center-center">
+  <div class="overlay-logo"><img src="" class="logo"></div>
+  <div class="url-section">
+    <div class="search-arrow">&rsaquo;</div>
+    <input type="url" id="url" placeholder="Enter a URL" autocomplete="off">
+  </div>
+</div>
+
+<script type="module">
+import {html, render} from './lit-html/lit-html.js';
+import {repeat} from './lit-html/lib/repeat.js';
+import {unsafeHTML} from './lit-html/lib/unsafe-html.js';
+
+import {runners} from './tools.mjs';
+
+function toolImage(key) {
+  return html`<img src="img/${key}-screenshot.png" class="tool-logo">`;
+  // return html`<img src="img/WPT-logo.png" class="tool-logo">`;
+}
+
+function renderTool(key, tool) {
+  return html`
+    <div class="tool-container" data-tool="${key}" data-logo="${tool.logo}">
+      <div class="tool">
+        <div class="tool-header">
+          <a href="${tool.url}" target="_blank" class="tool-name">${unsafeHTML(tool.name)}</a>
+          ${toolImage(key)}
+          <!--<iframe src="https://www.webpagetest.org/"></iframe>-->
+        </div>
+        <div class="tool-summary">${tool.desc}</div>
+      </div>
+    </div>`;
+}
+
+const toolsTemplate = (tools) => html`${
+  repeat(tools, (item) => item[0], (item, i) => {
+    const [key, tool] = item;
+    return renderTool(key, tool);
+  })
+}`;
+
+let selectedTool = null;
+const container = document.querySelector('#tools');
+const overlay = document.querySelector('.overlay');
+const url = document.querySelector('#url');
+
+render(toolsTemplate(Object.entries(runners)), container);
+
+const logos = Array.from(document.querySelectorAll('.tool .tool-logo'));
+const loadPromises = logos.map(logo => {
+  return new Promise(resolve => {
+    logo.addEventListener('load', e => resolve(e.target), {once: true});
+  });
+});
+Promise.all(loadPromises).then(logos => {
+  logos.forEach(logo => logo.classList.add('loaded'));
+});
+
+Array.from(document.querySelectorAll('.tool-container')).forEach(tool => {
+  tool.addEventListener('click', e => {
+    if (e.target.href) {
+      return false;
+    }
+    selectedTool = runners[tool.dataset.tool];
+    overlay.querySelector('.logo').src = selectedTool.logo;
+    overlay.classList.add('show');
+    url.focus();
+  });
+});
+
+document.addEventListener('click', e => {
+  if (e.target === overlay && overlay.classList.contains('show')) {
+    overlay.classList.remove('show');
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.keyCode === 27) { // ESC
+    overlay.classList.remove('show');
+  }
+});
+</script>
+<!-- <script nomodule src="app.bundle.js"></script> -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114661299-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-114661299-1');
+</script> -->
+</body>
+</html>
