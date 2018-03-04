@@ -178,13 +178,6 @@ main {
   visibility: visible;
   pointer-events: initial;
 }
-.overlay-logo {
-  width: 300px;
-  user-select: none;
-}
-.overlay-logo .logo {
-  width: 100%;
-}
 .url-section {
   --url-section-height: 50px;
   --url-section-border-radius: 2px;
@@ -283,4 +276,7 @@ main {
 }
 [data-tool="TMS"]::after {
   background-image: url(img/tool-testmysite.svg);
+}
+#screenshot-result {
+  height: 250px;
 }

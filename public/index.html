@@ -28,11 +28,12 @@
 </main>
 
 <div class="overlay layout vertical center-center">
-  <div class="overlay-logo"><img src="" class="logo"></div>
+  <!-- <div class="overlay-logo"><img src="" class="logo"></div> -->
   <div class="url-section">
     <div class="search-arrow">&rsaquo;</div>
     <input type="url" id="url" placeholder="Enter a URL" autocomplete="off">
   </div>
+  <img src="" id="screenshot-result">
 </div>
 
 <script type="module">
@@ -71,7 +72,8 @@ const toolsTemplate = (tools) => html`${
 let selectedTool = null;
 const container = document.querySelector('#tools');
 const overlay = document.querySelector('.overlay');
-const url = document.querySelector('#url');
+const screenshot = document.querySelector('#screenshot-result');
+const input = document.querySelector('#url');
 
 render(toolsTemplate(Object.entries(runners)), container);
 
@@ -91,10 +93,42 @@ Array.from(document.querySelectorAll('.tool-container')).forEach(tool => {
       return false;
     }
     selectedTool = runners[tool.dataset.tool];
-    overlay.querySelector('.logo').src = selectedTool.logo;
+    // overlay.querySelector('.logo').src = selectedTool.logo;
     overlay.classList.add('show');
-    url.focus();
+    input.focus();
   });
+});
+
+input.addEventListener('keydown', async e => {
+  if (e.keyCode !== 13) { // Enter
+    return;
+  }
+
+  let url = e.target.value;
+
+  if (!url.match(/^https?:\/\//)) {
+    url = `http://${url}`;
+    input.value = url;
+  }
+
+  if (!url.length || !input.validity.valid) {
+    alert('URL is not valid');
+    return;
+  }
+
+  // window.open(`/run?url=${url}&headless=false`, 'results');
+  // window.open(`/run?url=${url}`, 'results');
+
+  overlay.classList.add('running');
+  screenshot.src = '';
+
+  const resp = await fetch(`/run?url=${url}`);
+  const src = URL.createObjectURL(await resp.blob());
+  screenshot.src = src;
+  setTimeout(() => URL.revokeObjectURL(src), 100);
+
+  overlay.classList.remove('running');//, 'show');
+  input.value = '';
 });
 
 document.addEventListener('click', e => {

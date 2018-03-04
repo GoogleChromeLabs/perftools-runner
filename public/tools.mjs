@@ -17,17 +17,19 @@
 export const runners = {
   LH: {
     name: 'Lighthouse',
-    url: 'https://developers.google.com/web/tools/lighthouse/',
+    url: 'https://lighthouse-ci.appspot.com/try',
     desc: `Personalized advice on how to improve the performance, accessibility,
           PWA, SEO, and other best practices of your site.`,
     logo: 'img/lighthouse-logo.png',
+    urlInputSelector: '#url',
   },
   WPT: {
     name: 'WebPageTest',
-    url: 'http://webpagetest.org/',
+    url: 'https://www.webpagetest.org/easy.php',
     desc: `Compare performance of one or more pages in a controlled
            lab environment, testing on real devices. Lighthouse is integrated
            into WebPageTest.`,
+    urlInputSelector: '#url',
   },
   TMS: {
     name: 'Test My Site',
@@ -35,12 +37,14 @@ export const runners = {
     desc: `Diagnose site performance across devices and learn about fixes for
            improving the experience. Combines WebPageTest and PageSpeed
            Insights.`,
+    urlInputSelector: 'input[name="url-entry-input"]',
   },
   PSI: {
     name: 'PageSpeed Insights',
     desc: `Run to see field data for your site, alongside suggestions for
            common optimizations to improve it.`,
     url: 'https://developers.google.com/speed/pagespeed/insights/',
+    urlInputSelector: 'input[name="url"]',
   },
   SS: {
     name: 'Speed Scorecard &amp;<br>Impact Calculator',

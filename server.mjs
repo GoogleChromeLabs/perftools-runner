@@ -15,16 +15,29 @@
  */
 
 // import bodyParser from 'body-parser';
+// import fs from 'fs';
 import express from 'express';
-// import puppeteer from 'puppeteer';
-// import {runners} from './public/tools.mjs';
+import puppeteer from 'puppeteer';
+import * as LighthouseTool from './tools/lighthouse.mjs';
+import * as TMSTool from './tools/wpt.mjs';
+import * as WPTTool from './tools/wpt.mjs';
+import * as PSITool from './tools/psi.mjs';
+import {runners} from './public/tools.mjs';
 
 const app = express();
 
 // Async route handlers are wrapped with this to catch rejected promise errors.
-// const catchAsyncErrors = (fn) => (req, res, next) => {
-//   Promise.resolve(fn(req, res, next)).catch(next);
-// };
+const catchAsyncErrors = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+// eslint-disable-next-line require-jsdoc
+function errorHandler(err, req, res, next) {
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(500).send({errors: `Error running your code. ${err}`});
+}
 
 // app.use(function forceSSL(req, res, next) {
 //   const fromCron = req.get('X-Appengine-Cron');
@@ -56,22 +69,64 @@ app.use(express.static('node_modules'));
 //   next();
 // });
 
+app.get('/run', catchAsyncErrors(async (req, res) => {
+  const url = req.query.url;
+  // const tool = runners[req.query.tool || 'LH'];
+  const headless = req.query.headless === 'false' ? false : true;
+
+  if (!url) {
+    throw new Error('Please provide a URL.');
+  }
+
+  let browser;
+  try {
+    browser = await puppeteer.launch({headless});
+
+    // const [lhResults, wptResults] = await Promise.all([
+    //   // runLighthouse(browser, url, runners['LH']),
+    //   // runWPT(browser, url, runners['WPT']),
+    //   // runPSI(browser, url, runners['PSI']),
+    // ]);
+
+    // const {screenshot} = await LighthouseTool.run(browser, url);
+    const {screenshot} = await WPTTool.run(browser, url);
+    // const {screenshot} = await PSITool.run(browser, url);
+    // const {screenshot} = await TMSTool.run(browser, url);
+
+    await browser.close();
+
+    return res.type('image/png').send(screenshot);
+  } catch (err) {
+    if (browser) {
+      await browser.close();
+    }
+    throw err;
+  }
+
+  res.status(200).send('Done');
+}));
+
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
   console.log(`App listening on port ${PORT}. Press Ctrl+C to quit.`);
 });
 
-// // Make sure node server process stops if we get a terminating signal.
-// function processTerminator(sig) {
-//   if (typeof sig === 'string') {
-//     process.exit(1);
-//   }
-//   console.log('%s: Node server stopped.', Date(Date.now()));
-// }
+// Make sure node server process stops if we get a terminating signal.
+/**
+ * @param {string} sig Signal string.
+ */
+function processTerminator(sig) {
+  if (typeof sig === 'string') {
+    process.exit(1);
+  }
+  console.log('%s: Node server stopped.', Date(Date.now()));
+}
 
-// ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-// 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-// ].forEach(sig => {
-//   process.once(sig, () => processTerminator(sig));
-// });
+[
+  'SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT', 'SIGBUS',
+  'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM',
+].forEach(sig => {
+  process.once(sig, () => processTerminator(sig));
+});
