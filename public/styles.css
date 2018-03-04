@@ -24,7 +24,7 @@ body {
   line-height: 1.6;
   font-weight: 300;
   background-color: var(--material-blue-grey-900);
-  /* overflow: hidden; */
+  overflow: hidden;
 }
 a {
   color: var(--material-blue-grey-dark);
@@ -79,13 +79,23 @@ main {
   display: flex;
   flex-direction: column;
   border-radius: 5px;
-  border: 8px solid var(--material-blue-grey-700);
+  border: var(--padding-half) solid var(--material-blue-grey-700);
   margin: 0 var(--padding) 0 0;
   contain: strict;
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
   user-select: none;
+}
+.tool-container:focus {
+  outline: 3px solid var(--material-blue-grey-800);
+}
+.tool-container.selected {
+  filter: drop-shadow(0 0 10px var(--material-blue-grey-100));
+}
+.tool-container.selected .tool {
+  border-color: var(--material-blue-grey-50);
+  border-width: var(--padding);
 }
 .tool:hover .tool-name {
   opacity: 1;
@@ -169,7 +179,7 @@ main {
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: rgba(236,239,241,0.7);
+  background-color: rgba(236,239,241,0.8);
   visibility: hidden;
   pointer-events: none;
   z-index: 100;
@@ -178,20 +188,31 @@ main {
   visibility: visible;
   pointer-events: initial;
 }
+.overlay.show.running .progress {
+  display: initial;
+}
+.overlay-status {
+  color: var(--material-blue-grey-600);
+  margin: var(--padding);
+  position: absolute;
+  text-align: center;
+  right: 0;
+  left: 0;
+  font-weight: 500;
+}
 .url-section {
-  --url-section-height: 50px;
+  --url-section-height: 100px;
   --url-section-border-radius: 2px;
   width: 100%;
   max-width: 500px;
   position: relative;
-  height: var(--url-section-height);
-  contain: content;
+  margin: 0 auto;
 }
 #url {
-  --shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
-  --hover-shadow: 0 3px 8px 0 rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.08);
+  --shadow: 0 6px 6px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+  --hover-shadow: 0 12px 12px 0 rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.08);
   border: none;
-  height: 100%;
+  height: var(--url-section-height);
   width: 100%;
   outline: none;
   border-radius: var(--url-section-border-radius);
@@ -199,7 +220,8 @@ main {
   transition: box-shadow 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
   padding: 0 var(--padding);
   padding-right: calc(27px + var(--padding));
-  font: inherit;
+  font-family: inherit;
+  font-size: 32px;
   z-index: 1;
 }
 #url:hover {
@@ -224,19 +246,19 @@ main {
   color: #555;
   border-bottom-left-radius: var(--url-section-border-radius);
   border-bottom-right-radius: var(--url-section-border-radius);
-  font-size: 30px;
+  font-size: 50px;
   height: var(--url-section-height);
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  align-self: flex-end;
-  padding: var(--padding-half);
+  padding: var(--padding);
   right: 0;
   user-select: none;
+  z-index: 2;
 }
 .search-arrow:hover {
-  box-shadow: -3px 0px 3px #eee;
+  box-shadow: -3px 0px 13px rgba(0,0,0,0.2);
 }
 [data-tool] {
   position: relative;
@@ -279,4 +301,52 @@ main {
 }
 #screenshot-result {
   height: 250px;
+}
+.progress {
+  position: relative;
+  height: 5px;
+  display: block;
+  width: 100%;
+  background-color: var(--material-blue-grey-100);
+  /* border-radius: 2px; */
+  /* margin: .5rem 0 1rem 0; */
+  margin: 0;
+  overflow: hidden;
+  contain: strict;
+  display: none;
+}
+.progress .indeterminate {
+  background-color: var(--material-blue-grey-900);
+}
+.progress .indeterminate::before {
+  content: '';
+  position: absolute;
+  background-color: inherit;
+  top: 0;
+  left: 3px;
+  bottom: 0;
+  will-change: left, right;
+  animation: indeterminate 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+}
+.progress .indeterminate::after {
+  content: '';
+  position: absolute;
+  background-color: inherit;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  will-change: left, right;
+  animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+  animation-delay: 1.15s;
+}
+/* TODO: animate transforms instead of left/right */
+@keyframes indeterminate{
+  0% {left:-35%;right:100%}
+  60% {left:100%;right:-90%}
+  100% {left:100%;right:-90%}
+}
+@keyframes indeterminate-short {
+  0% {left:-200%;right:100%}
+  60% {left:107%;right:-8%}
+  100% {left:107%;right:-8%}
 }

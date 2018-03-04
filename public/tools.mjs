@@ -31,6 +31,13 @@ export const runners = {
            into WebPageTest.`,
     urlInputSelector: '#url',
   },
+  PSI: {
+    name: 'PageSpeed Insights',
+    desc: `Run to see field data for your site, alongside suggestions for
+           common optimizations to improve it.`,
+    url: 'https://developers.google.com/speed/pagespeed/insights/',
+    urlInputSelector: 'input[name="url"]',
+  },
   TMS: {
     name: 'Test My Site',
     url: 'https://testmysite.thinkwithgoogle.com/',
@@ -38,13 +45,6 @@ export const runners = {
            improving the experience. Combines WebPageTest and PageSpeed
            Insights.`,
     urlInputSelector: 'input[name="url-entry-input"]',
-  },
-  PSI: {
-    name: 'PageSpeed Insights',
-    desc: `Run to see field data for your site, alongside suggestions for
-           common optimizations to improve it.`,
-    url: 'https://developers.google.com/speed/pagespeed/insights/',
-    urlInputSelector: 'input[name="url"]',
   },
   SS: {
     name: 'Speed Scorecard &amp;<br>Impact Calculator',
