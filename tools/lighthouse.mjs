@@ -17,6 +17,7 @@
 import lighthouse from 'lighthouse';
 import ReportGeneratorV2 from 'lighthouse/lighthouse-core/report/v2/report-generator';
 import chromeLauncher from 'chrome-launcher';
+import * as tools from '../public/tools.mjs';
 
 /**
  * Run Lighthouse.
@@ -25,27 +26,6 @@ import chromeLauncher from 'chrome-launcher';
  * @return {!Promise<!{screenshot: buffer, html: string}>}
  */
 async function run(browser, url) {
-  // const page = await browser.newPage();
-  // await page.setViewport({width: 1280, height: 1024, deviceScaleFactor: 2});
-
-  // await page.goto(tool.url);
-  // await page.waitForSelector(tool.urlInputSelector);
-
-  // const inputHandle = await page.$(tool.urlInputSelector);
-  // await inputHandle.type(url);
-  // await inputHandle.press('Enter'); // Run it!
-
-  // await page.waitForSelector('.done #reportLink', {visible: true});
-  // const reportLink = await page.$eval('.done #reportLink', el => el.href);
-  // await page.goto(reportLink, {waitUntil: 'networkidle0'});
-
-  // const obj = {
-  //   screenshot: await page.screenshot({fullPage: true}),
-  //   html: await page.content(),
-  // };
-
-  // await page.close();
-
   const opts = {
     chromeFlags: ['--headless'],
     // logLevel: 'info',
@@ -61,13 +41,14 @@ async function run(browser, url) {
   await chrome.kill();
 
   const page = await browser.newPage();
-  await page.setViewport({width: 1280, height: 1024, deviceScaleFactor: 2});
+  await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
   // Take screenshot of html results using Puppeteer.
   const html = new ReportGeneratorV2().generateReportHtml(lhr);
   await page.setContent(html);
 
   const obj = {
+    tool: 'LH',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
   };

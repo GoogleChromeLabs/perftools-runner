@@ -14,6 +14,10 @@
   --material-blue-grey-900: #263238;
   --material-red-500: #F44336;
   --material-red-600: #E53935;
+  --material-green-200: #A5D6A7;
+  --material-green-600: #4CAF50;
+  --material-green-800: #2E7D32;
+  --material-green-900: #1B5E20;
   --card-size: 375px;
 }
 body {
@@ -88,7 +92,8 @@ main {
   user-select: none;
 }
 .tool-container:focus {
-  outline: 3px solid var(--material-blue-grey-800);
+  /* outline: 3px solid var(--material-blue-grey-800); */
+  outline: none;
 }
 .tool-container.selected {
   filter: drop-shadow(0 0 10px var(--material-blue-grey-100));
@@ -182,7 +187,7 @@ main {
   background-color: rgba(236,239,241,0.8);
   visibility: hidden;
   pointer-events: none;
-  z-index: 100;
+  z-index: 5;
 }
 .overlay.show {
   visibility: visible;
@@ -192,7 +197,7 @@ main {
   display: initial;
 }
 .overlay-status {
-  color: var(--material-blue-grey-600);
+  color: var(--material-green-800);
   margin: var(--padding);
   position: absolute;
   text-align: center;
@@ -257,6 +262,10 @@ main {
   user-select: none;
   z-index: 2;
 }
+.search-arrow.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
 .search-arrow:hover {
   box-shadow: -3px 0px 13px rgba(0,0,0,0.2);
 }
@@ -299,15 +308,25 @@ main {
 [data-tool="TMS"]::after {
   background-image: url(img/tool-testmysite.svg);
 }
-#screenshot-result {
-  height: 250px;
+#screenshot-results {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 100;
+  justify-content: space-evenly;
+}
+#screenshot-results img {
+  height: 80vh;
 }
 .progress {
   position: relative;
   height: 5px;
   display: block;
   width: 100%;
-  background-color: var(--material-blue-grey-100);
+  background-color: var(--material-green-200);
   /* border-radius: 2px; */
   /* margin: .5rem 0 1rem 0; */
   margin: 0;
@@ -316,7 +335,7 @@ main {
   display: none;
 }
 .progress .indeterminate {
-  background-color: var(--material-blue-grey-900);
+  background-color: var(--material-green-600);
 }
 .progress .indeterminate::before {
   content: '';

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {runners} from '../public/tools.mjs';
+import * as tools from '../public/tools.mjs';
 
-const TOOL = runners['TMS'];
+const TOOL = tools.runners['TMS'];
 
 /**
  * Run TestMySite tool using Puppeteer.
@@ -26,7 +26,7 @@ const TOOL = runners['TMS'];
  */
 async function run(browser, url) {
   const page = await browser.newPage();
-  await page.setViewport({width: 1280, height: 1024, deviceScaleFactor: 2});
+  await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
   await page.setRequestInterception(true);
   page.on('request', req => {
@@ -47,6 +47,7 @@ async function run(browser, url) {
   await page.waitForSelector('.results', {timeout: 60 * 1000});
 
   const obj = {
+    tool: 'TMS',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
   };

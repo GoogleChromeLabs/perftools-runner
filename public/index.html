@@ -17,7 +17,13 @@
 <main class="layout vertical center-center">
   <header class="layout vertical center-center">
     <h1>Take our performance tools for a spin</h1>
-    <h3>1. Select the tool(s) you want to run. 2. Enter an URL to test a site.</h3>
+    <h3>
+      <ol>
+        <li>Selct the tool(s) you want to run.</li>
+        <li>Hit "space" bar when you're ready.</li>
+        <li>Enter a URL to test.</li>
+      </ol>
+    </h3>
   </header>
   <div id="tools" class="layout">
     <div class="tool"></div>
@@ -28,6 +34,10 @@
   </div>
 </main>
 
+<div id="screenshot-results" class="layout center-center">
+  <!-- filled dynamically -->
+</div>
+
 <div class="overlay layout vertical center-center">
   <div class="url-section">
     <div class="search-arrow">&rsaquo;</div>
@@ -37,142 +47,9 @@
       <div class="indeterminate"></div>
     </div>
   </div>
-  <div>
-    <img src="" id="screenshot-result">
-  </div>
 </div>
 
-<script type="module">
-import {html, render} from './lit-html/lit-html.js';
-import {repeat} from './lit-html/lib/repeat.js';
-import {unsafeHTML} from './lit-html/lib/unsafe-html.js';
-
-import {runners} from './tools.mjs';
-
-function toolImage(key) {
-  return html`<img src="img/${key}-screenshot.png" class="tool-logo">`;
-  // return html`<img src="img/WPT-logo.png" class="tool-logo">`;
-}
-
-function renderTool(key, tool) {
-  return html`
-    <div class="tool-container" data-tool="${key}" data-logo="${tool.logo}" tabindex="0">
-      <div class="tool">
-        <div class="tool-header">
-          <a href="${tool.url}" target="_blank" class="tool-name">${unsafeHTML(tool.name)}</a>
-          ${toolImage(key)}
-          <!--<iframe src="https://www.webpagetest.org/"></iframe>-->
-        </div>
-        <div class="tool-summary">${tool.desc}</div>
-      </div>
-    </div>`;
-}
-
-function resetUI() {
-  input.value = '';
-  overlay.classList.remove('show');
-  Array.from(tools).forEach(tool => tool.classList.remove('selected'));
-}
-
-function toolsTemplate(tools) {
-  return  html`${
-    repeat(tools, (item) => item[0], (item, i) => {
-      const [key, tool] = item;
-      return renderTool(key, tool);
-    })
-  }`;
-}
-
-const container = document.querySelector('#tools');
-render(toolsTemplate(Object.entries(runners)), container);
-
-// let selectedTool = null;
-const tools = document.querySelectorAll('.tool-container');
-const overlay = document.querySelector('.overlay');
-const screenshot = document.querySelector('#screenshot-result');
-const input = document.querySelector('#url');
-
-const logos = Array.from(document.querySelectorAll('.tool .tool-logo'));
-const loadPromises = logos.map(logo => {
-  return new Promise(resolve => {
-    logo.addEventListener('load', e => resolve(e.target), {once: true});
-  });
-});
-Promise.all(loadPromises).then(logos => {
-  logos.forEach(logo => logo.classList.add('loaded'));
-});
-
-Array.from(tools).forEach(tool => {
-  tool.addEventListener('click', e => {
-    if (e.target.href) {
-      return false;
-    }
-    // selectedTool = runners[tool.dataset.tool];
-    tool.classList.toggle('selected');
-    overlay.classList.add('show');
-    input.focus();
-  });
-});
-
-input.addEventListener('keydown', async e => {
-  if (e.keyCode !== 13) { // Enter
-    return;
-  }
-
-  let url = e.target.value;
-
-  if (!url.match(/^https?:\/\//)) {
-    url = `http://${url}`;
-    input.value = url;
-  }
-
-  if (!url.length || !input.validity.valid) {
-    alert('URL is not valid');
-    return;
-  }
-
-  overlay.classList.add('running');
-  screenshot.src = '';
-  document.querySelector('.overlay-status').textContent = 'Testing...';
-
-  const resp = await fetch(`/run?url=${url}`);
-  const src = URL.createObjectURL(await resp.blob());
-  screenshot.src = src;
-  setTimeout(() => URL.revokeObjectURL(src), 100);
-
-  overlay.classList.remove('running');
-  input.value = '';
-});
-
-document.addEventListener('click', e => {
-  if (e.target !== input && overlay.contains(e.target) &&
-      overlay.classList.contains('show')) {
-    resetUI();
-  }
-});
-
-let selectedTool = 0;
-document.addEventListener('keydown', e => {
-  if (e.keyCode === 27) { // ESC
-    resetUI();
-    return;
-  }
-
-  if (e.target === input) {
-    return;
-  }
-
-  switch (e.keyCode) {
-    case 37: // left arrow
-      // TODO: move to previous tool
-      break;
-    // case 32: // space
-    case 39: // right arrow
-      // TODO: move to next tool
-      break;
-  }
-});
-</script>
+<script type="module" src="app.js"></script>
 <!-- <script nomodule src="app.bundle.js"></script> -->
 <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-114661299-1"></script>
 <script>

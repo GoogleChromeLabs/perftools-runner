@@ -17,10 +17,9 @@
 import url from 'url';
 const {URL} = url;
 import fetch from 'node-fetch';
-import {runners} from '../public/tools.mjs';
+import * as tools from '../public/tools.mjs';
 
-const TOOL = runners['WPT'];
-
+const TOOL = tools.runners['WPT'];
 const WPT_API_KEY = 'A.04c7244ba25a5d6d717b0343a821aa59';
 // const WPT_PR_MAP = new Map();
 
@@ -84,7 +83,7 @@ async function startOnWebpageTest(testUrl, pingback = null) {
  */
 async function run(browser, url) {
   // const page = await browser.newPage();
-  // await page.setViewport({width: 1280, height: 1024, deviceScaleFactor: 2});
+  // await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
   // await page.goto(TOOL.url);
   // await Promise.all([
@@ -103,11 +102,12 @@ async function run(browser, url) {
   const resultsUrl = await startOnWebpageTest(url);
 
   const page = await browser.newPage();
-  await page.setViewport({width: 1280, height: 1024, deviceScaleFactor: 2});
+  await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
   await page.goto(`${resultsUrl}1/details/`);
 
   const obj = {
+    tool: 'WPT',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
   };

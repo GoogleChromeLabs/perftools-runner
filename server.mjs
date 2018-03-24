@@ -15,14 +15,17 @@
  */
 
 // import bodyParser from 'body-parser';
-// import fs from 'fs';
+import del from 'del';
+import fs from 'fs';
+import util from 'util';
 import express from 'express';
 import puppeteer from 'puppeteer';
-import * as LighthouseTool from './tools/lighthouse.mjs';
+import * as LHTool from './tools/lighthouse.mjs';
 import * as TMSTool from './tools/wpt.mjs';
 import * as WPTTool from './tools/wpt.mjs';
 import * as PSITool from './tools/psi.mjs';
 import {runners} from './public/tools.mjs';
+import fetch from 'node-fetch';
 
 const app = express();
 
@@ -61,6 +64,7 @@ function errorHandler(err, req, res, next) {
 
 // app.use(bodyParser.json());
 app.use(express.static('public', {extensions: ['html', 'htm']}));
+app.use(express.static('tmp'));
 app.use(express.static('node_modules'));
 // app.use(function cors(req, res, next) {
 //   res.set('Access-Control-Allow-Origin', '*');
@@ -71,39 +75,52 @@ app.use(express.static('node_modules'));
 
 app.get('/run', catchAsyncErrors(async (req, res) => {
   const url = req.query.url;
-  // const tool = runners[req.query.tool || 'LH'];
+  let tools = req.query.tools ? req.query.tools.split(',') : [];
   const headless = req.query.headless === 'false' ? false : true;
+
+  if (!tools.length) {
+    throw new Error('Please provide a tool ?tools=[LH,PSI,WPT,TMS,SS].');
+  }
 
   if (!url) {
     throw new Error('Please provide a URL.');
   }
 
-  let browser;
+  // Clear previous run screeshots.
+  const paths = await del(['tmp/*']);
+
+  // Check if URL exists before kicking off the tools.
+  // Attempt to fetch the user's URL.
   try {
-    browser = await puppeteer.launch({headless});
-
-    // const [lhResults, wptResults] = await Promise.all([
-    //   // runLighthouse(browser, url, runners['LH']),
-    //   // runWPT(browser, url, runners['WPT']),
-    //   // runPSI(browser, url, runners['PSI']),
-    // ]);
-
-    // const {screenshot} = await LighthouseTool.run(browser, url);
-    const {screenshot} = await WPTTool.run(browser, url);
-    // const {screenshot} = await PSITool.run(browser, url);
-    // const {screenshot} = await TMSTool.run(browser, url);
-
-    await browser.close();
-
-    return res.type('image/png').send(screenshot);
+    await fetch(url);
   } catch (err) {
-    if (browser) {
-      await browser.close();
-    }
     throw err;
   }
 
-  res.status(200).send('Done');
+  const browser = await puppeteer.launch({
+    headless,
+    //slowMo: 200
+  });
+
+  try {
+    tools = tools.filter(tool => Object.keys(runners).includes(tool));
+    const toolsToRun = tools.map(tool => eval(`${tool}Tool`).run(browser, url));
+
+    console.info(`Starting new tool run with ${tools}...`);
+
+    const results = await Promise.all(toolsToRun);
+    for (const {tool, screenshot} of results) {
+      await util.promisify(fs.writeFile)(`./tmp/${tool}.png`, screenshot);
+    }
+    // return res.type('image/png').send(screenshots);
+    return res.status(200).send(tools);
+  } catch (err) {
+    throw err;
+  } finally {
+    await browser.close();
+  }
+
+  // res.status(200).send('Done');
 }));
 
 app.use(errorHandler);

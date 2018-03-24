@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import {runners} from '../public/tools.mjs';
+import * as tools from '../public/tools.mjs';
 
-const TOOL = runners['PSI'];
+const TOOL = tools.runners['PSI'];
 
 /**
  * Run PSI tool using Puppeteer.
@@ -26,18 +26,20 @@ const TOOL = runners['PSI'];
  */
 async function run(browser, url) {
   const page = await browser.newPage();
-  await page.setViewport({width: 1280, height: 1024, deviceScaleFactor: 2});
+  await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
-  await page.goto(TOOL.url);
-  await page.waitForSelector(TOOL.urlInputSelector);
+  await page.goto(`${TOOL.url}?url=${url}`);
+  // Type the URL into the input.
+  // await page.goto(TOOL.url);
+  // await page.waitForSelector(TOOL.urlInputSelector);
+  // const inputHandle = await page.$(TOOL.urlInputSelector);
+  // await inputHandle.type(url);
+  // await inputHandle.press('Enter'); // Run it!
 
-  const inputHandle = await page.$(TOOL.urlInputSelector);
-  await inputHandle.type(url);
-  await inputHandle.press('Enter'); // Run it!
-
-  await page.waitForSelector('#page-speed-insights.results', {timeout: 60 * 1000});
+  await page.waitForSelector('#page-speed-insights.results', {timeout: 10 * 1000});
 
   const obj = {
+    tool: 'PSI',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
   };

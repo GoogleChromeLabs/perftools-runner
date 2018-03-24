@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
+export const DEFAULT_SCREENSHOT_VIEWPORT = {
+  width: 1280,
+  height: 1024,
+  deviceScaleFactor: 2,
+};
+
 export const runners = {
   LH: {
     name: 'Lighthouse',
-    url: 'https://lighthouse-ci.appspot.com/try',
+    url: 'https://developers.google.com/web/tools/lighthouse',
     desc: `Personalized advice on how to improve the performance, accessibility,
           PWA, SEO, and other best practices of your site.`,
     logo: 'img/lighthouse-logo.png',
