@@ -28,14 +28,14 @@ async function run(browser, url) {
   const page = await browser.newPage();
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
-  await page.setRequestInterception(true);
-  page.on('request', req => {
-    if (req.url().includes('https://www.google.com/recaptcha/api.js')) {
-      req.abort();
-      return;
-    }
-    req.continue();
-  });
+  // await page.setRequestInterception(true);
+  // page.on('request', req => {
+  //   if (req.url().includes('https://www.google.com/recaptcha/api.js')) {
+  //     req.abort();
+  //     return;
+  //   }
+  //   req.continue();
+  // });
 
   await page.goto(TOOL.url);
   await page.waitForSelector(TOOL.urlInputSelector);

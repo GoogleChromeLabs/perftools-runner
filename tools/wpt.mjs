@@ -19,8 +19,8 @@ const {URL} = url;
 import fetch from 'node-fetch';
 import * as tools from '../public/tools.mjs';
 
-const TOOL = tools.runners['WPT'];
 const WPT_API_KEY = 'A.04c7244ba25a5d6d717b0343a821aa59';
+// const TOOL = tools.runners['WPT'];
 // const WPT_PR_MAP = new Map();
 
 /**
@@ -82,28 +82,10 @@ async function startOnWebpageTest(testUrl, pingback = null) {
  * @return {!Promise<!{screenshot: buffer, html: string}>}
  */
 async function run(browser, url) {
-  // const page = await browser.newPage();
-  // await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
-
-  // await page.goto(TOOL.url);
-  // await Promise.all([
-  //   page.waitForSelector(TOOL.urlInputSelector),
-  //   page.waitForSelector('#lighthouse'),
-  // ]);
-
-  // // Check Lighthouse checkbox so report is included.
-  // await page.$eval('#lighthouse', checkbox => checkbox.checked = true);
-  // const inputHandle = await page.$(TOOL.urlInputSelector);
-  // await inputHandle.type(url);
-  // await inputHandle.press('Enter'); // Run it!
-
-  // await page.waitForSelector('#test_results-container', {timeout: 120 * 1000});
-
   const resultsUrl = await startOnWebpageTest(url);
 
   const page = await browser.newPage();
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
-
   await page.goto(`${resultsUrl}1/details/`);
 
   const obj = {

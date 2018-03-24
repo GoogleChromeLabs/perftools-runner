@@ -1,44 +1,35 @@
-/* eslint-env browser */
-
-import {html, render} from './lit-html/lit-html.js';
-import {repeat} from './lit-html/lib/repeat.js';
-import {unsafeHTML} from './lit-html/lib/unsafe-html.js';
-
+import * as render from './render.js';
 import {runners} from './tools.mjs';
 
-/**
- * @param {string} key
- */
-function toolImage(key) {
-  return html`<img src="img/${key}-screenshot.png" class="tool-logo">`;
-}
+// Render main HTML before anything else.
+const container = document.querySelector('#tools');
+render.renderToolCards(Object.entries(runners), container);
+
+loadLogos();
+
+let selectedTools = [];
+const tools = document.querySelectorAll('.tool-container');
+const screenshotContainer = document.querySelector('#screenshot-results');
+const overlay = document.querySelector('.overlay');
+const overlayStatus = document.querySelector('.overlay-status');
+const input = document.querySelector('#url');
+const arrow = document.querySelector('.search-arrow');
 
 /**
- * @param {!Array<string>} tool
+ * Fades in the tool screenshots.
+ * @return {!Promise} Resolves when the images are loaded.
  */
-function renderResultScreenshots(tools) {
-  return  html`${
-    repeat(tools, (tool) => tool, (tool, i) => {
-      return html`<img src="/${tool}.png" class="tool-result">`;
-    })
-  }`;
-}
+async function loadLogos() {
+  const logos = Array.from(document.querySelectorAll('.tool .tool-logo'));
+  const loadPromises = logos.map(logo => {
+    return new Promise(resolve => {
+      logo.addEventListener('load', e => resolve(e.target), {once: true});
+    });
+  });
 
-/**
- * @param {string} key
- * @param {string} tool
- */
-function renderTool(key, tool) {
-  return html`
-    <div class="tool-container" data-tool="${key}" data-logo="${tool.logo}" tabindex="0">
-      <div class="tool">
-        <div class="tool-header">
-          <span class="tool-name">${unsafeHTML(tool.name)}</span>
-          ${toolImage(key)}
-        </div>
-        <div class="tool-summary">${tool.desc}</div>
-      </div>
-    </div>`;
+  return Promise.all(loadPromises).then(logos => {
+    logos.forEach(logo => logo.classList.add('loaded'));
+  });
 }
 
 /**
@@ -48,19 +39,7 @@ function resetUI() {
   toggleInputOverlay(true);
   Array.from(tools).forEach(tool => tool.classList.remove('selected'));
   selectedTools = [];
-  render(renderResultScreenshots([]), screenshotContainer);
-}
-
-/**
- * @param {!Array<!Object>} tools
- */
-function toolsTemplate(tools) {
-  return html`${
-    repeat(tools, (item) => item[0], (item, i) => {
-      const [key, tool] = item;
-      return renderTool(key, tool);
-    })
-  }`;
+  render.renderScreenshots([], screenshotContainer);
 }
 
 /**
@@ -78,7 +57,7 @@ function toggleInputOverlay(clear = false) {
 }
 
 /**
- * Runs the URL on the selected tools.
+ * Runs the URL in the selected tools.
  * @param {string} url
  */
 async function go(url) {
@@ -93,11 +72,10 @@ async function go(url) {
     alert('URL is not valid');
     return;
   } else if (!selectedTools.length) {
-    alert('Please select a tool.');
+    alert('Please select a tool');
     return;
   }
 
-  const overlayStatus = document.querySelector('.overlay-status');
   overlay.classList.add('running');
   overlayStatus.textContent = 'Testing...';
   arrow.classList.add('disabled');
@@ -107,7 +85,7 @@ async function go(url) {
   runURL.searchParams.set('tools', selectedTools);
 
   const tools = await fetch(runURL.href).then(resp => resp.json());
-  render(renderResultScreenshots(tools), screenshotContainer);
+  render.renderScreenshots(tools, screenshotContainer);
 
   arrow.classList.remove('disabled');
   overlay.classList.remove('running');
@@ -115,35 +93,15 @@ async function go(url) {
   input.value = '';
 }
 
-// Render main HTML before anything else.
-const container = document.querySelector('#tools');
-render(toolsTemplate(Object.entries(runners)), container);
-
-let selectedTools = [];
-const tools = document.querySelectorAll('.tool-container');
-const screenshotContainer = document.querySelector('#screenshot-results');
-const overlay = document.querySelector('.overlay');
-const input = document.querySelector('#url');
-const arrow = document.querySelector('.search-arrow');
-const logos = Array.from(document.querySelectorAll('.tool .tool-logo'));
-
-const loadPromises = logos.map(logo => {
-  return new Promise(resolve => {
-    logo.addEventListener('load', e => resolve(e.target), {once: true});
-  });
-});
-
-Promise.all(loadPromises).then(logos => {
-  logos.forEach(logo => logo.classList.add('loaded'));
-});
-
 Array.from(tools).forEach(tool => {
   tool.addEventListener('click', e => {
     e.stopPropagation();
 
-    if (e.target.href) {
-      return false;
+    if (tool.href && tool.dataset.primary === 'false') {
+      return;
     }
+
+    e.preventDefault();
 
     const idx = selectedTools.findIndex(t => tool.dataset.tool === t);
     if (idx != -1) {
@@ -191,9 +149,11 @@ document.addEventListener('keydown', e => {
 
   switch (e.keyCode) {
     case 32: // space
-      if (selectedTools.length) {
-        toggleInputOverlay();
+      if (!selectedTools.length) {
+        alert('Please select a tool');
+        return;
       }
+      toggleInputOverlay();
       break;
     case 37: // left arrow
       // TODO: move to previous tool

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-// import bodyParser from 'body-parser';
 import del from 'del';
 import fs from 'fs';
 import util from 'util';
 import express from 'express';
 import puppeteer from 'puppeteer';
+/* eslint-disable no-unused-vars */
 import * as LHTool from './tools/lighthouse.mjs';
-import * as TMSTool from './tools/wpt.mjs';
+import * as TMSTool from './tools/tms.mjs';
 import * as WPTTool from './tools/wpt.mjs';
 import * as PSITool from './tools/psi.mjs';
+/* eslint-enable no-unused-vars */
 import {runners} from './public/tools.mjs';
 import fetch from 'node-fetch';
 
@@ -62,7 +63,6 @@ function errorHandler(err, req, res, next) {
 //   next();
 // });
 
-// app.use(bodyParser.json());
 app.use(express.static('public', {extensions: ['html', 'htm']}));
 app.use(express.static('tmp'));
 app.use(express.static('node_modules'));
@@ -86,8 +86,8 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     throw new Error('Please provide a URL.');
   }
 
-  // Clear previous run screeshots.
-  const paths = await del(['tmp/*']);
+  // Clear previous run screenshots.
+  const paths = await del(['tmp/*']); // eslint-disable-line
 
   // Check if URL exists before kicking off the tools.
   // Attempt to fetch the user's URL.
@@ -99,7 +99,7 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
 
   const browser = await puppeteer.launch({
     headless,
-    //slowMo: 200
+    // slowMo: 200
   });
 
   try {

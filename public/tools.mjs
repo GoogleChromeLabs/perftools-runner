@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-export const DEFAULT_SCREENSHOT_VIEWPORT = {
+const DEFAULT_SCREENSHOT_VIEWPORT = {
   width: 1280,
   height: 1024,
   deviceScaleFactor: 2,
 };
 
-export const runners = {
+const runners = {
   LH: {
     name: 'Lighthouse',
     url: 'https://developers.google.com/web/tools/lighthouse',
@@ -28,6 +28,7 @@ export const runners = {
           PWA, SEO, and other best practices of your site.`,
     logo: 'img/lighthouse-logo.png',
     urlInputSelector: '#url',
+    primary: true,
   },
   WPT: {
     name: 'WebPageTest',
@@ -36,6 +37,7 @@ export const runners = {
            lab environment, testing on real devices. Lighthouse is integrated
            into WebPageTest.`,
     urlInputSelector: '#url',
+    primary: true,
   },
   PSI: {
     name: 'PageSpeed Insights',
@@ -43,6 +45,7 @@ export const runners = {
            common optimizations to improve it.`,
     url: 'https://developers.google.com/speed/pagespeed/insights/',
     urlInputSelector: 'input[name="url"]',
+    primary: true,
   },
   TMS: {
     name: 'Test My Site',
@@ -51,13 +54,22 @@ export const runners = {
            improving the experience. Combines WebPageTest and PageSpeed
            Insights.`,
     urlInputSelector: 'input[name="url-entry-input"]',
+    primary: false,
   },
   SS: {
     name: 'Speed Scorecard &amp;<br>Impact Calculator',
     desc: `Compare your mobile site speed & revenue opportunity against peers
            in over 10 countries using data from Chrome UX Report & Google Analytics.`,
     url: 'https://www.thinkwithgoogle.com/feature/mobile/',
+    primary: false,
+  },
+  PPTR: {
+    name: 'Puppeteer',
+    desc: `A Node library that provides a high-level API to control headless/full
+           Chrome (or Chromium) over the DevTools Protocol.`,
+    url: 'https://developers.google.com/web/tools/puppeteer/',
+    primary: false,
   },
 };
 
-// export {runners};
+export {runners, DEFAULT_SCREENSHOT_VIEWPORT};
