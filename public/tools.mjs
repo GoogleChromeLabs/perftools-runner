@@ -76,7 +76,7 @@ const runners = {
           real-world Chrome users experience popular destinations on the web.`,
     url: 'https://developers.google.com/web/tools/chrome-user-experience-report/',
     primary: false,
-  }
+  },
 };
 
 export {runners, DEFAULT_SCREENSHOT_VIEWPORT};
