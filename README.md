@@ -22,6 +22,8 @@ This fires off a request o the `/run` handler. This handler takes a `url` and
 `tools` param. The latter is a "," separated list of tools to run. One
 of LH, PSI, WPT.
 
+The response is a JSON array of the tools that were run (e.g. `["LH", "PSI"]`).
+
 **Examples**
 
 Run Lighthouse and PSI against https://example.com:
