@@ -14,10 +14,16 @@
   --material-blue-grey-900: #263238;
   --material-red-500: #F44336;
   --material-red-600: #E53935;
+  --material-green-50: #E8F5E9;
+  --material-green-100: #C8E6C9;
   --material-green-200: #A5D6A7;
+  --material-green-300: #81C784;
+  --material-green-400: #66BB6A;
   --material-green-600: #4CAF50;
   --material-green-800: #2E7D32;
   --material-green-900: #1B5E20;
+  --material-green-A100: #B9F6CA;
+  --material-green-A700: #00C853;
   --card-size: 375px;
   --card-size-scale-factor: 0.6;
 }
@@ -255,7 +261,7 @@ main {
   width: 100%;
   max-width: 600px;
   position: relative;
-  margin: 0 auto;
+  overflow: hidden;
 }
 #url {
   /* --shadow: 0 6px 6px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08); */
@@ -371,17 +377,19 @@ main {
   height: 80vh;
 }
 .progress {
-  position: relative;
-  height: 5px;
+  --progress-bar-height: 9px;
+  position: absolute;
+  height: var(--progress-bar-height);
   display: block;
   width: 100%;
-  background-color: var(--material-green-200);
-  /* border-radius: 2px; */
-  /* margin: .5rem 0 1rem 0; */
-  margin: 0;
+  background-color: var(--material-green-100);
+  border-radius: 2px;
+  margin: 0 auto;
   overflow: hidden;
   contain: strict;
   display: none;
+  bottom: 5px;
+  clip-path: url(#progress-clip);
 }
 .progress .indeterminate {
   background-color: var(--material-green-600);

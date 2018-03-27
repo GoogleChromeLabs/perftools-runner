@@ -28,23 +28,42 @@ async function run(browser, url) {
   const page = await browser.newPage();
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
+  // const ua = await browser.userAgent();
+  // await page.setUserAgent(ua.replace('Headless', ''));
+
   // await page.setRequestInterception(true);
   // page.on('request', req => {
-  //   if (req.url().includes('https://www.google.com/recaptcha/api.js')) {
+  //   if (req.url().includes('https://www.google.com/recaptcha/api.js') ||
+  //       req.url().includes('app.js')) {
   //     req.abort();
   //     return;
   //   }
   //   req.continue();
   // });
 
-  await page.goto(TOOL.url);
-  await page.waitForSelector(TOOL.urlInputSelector);
+  // page.on('domcontentloaded', async e => {
+  //   await page.$$('body script', scripts => {
+  //     scripts[scripts.length - 1].remove();
+  //   });
+  // });
 
-  const inputHandle = await page.$(TOOL.urlInputSelector);
-  await inputHandle.type(url);
-  await inputHandle.press('Enter'); // Run it!
+  // await page.evaluateOnNewDocument(() => {
+  //   document.addEventListener('DOMContentLoaded', e => {
+  //     document.scripts[document.scripts.length - 1].remove();
+  //   });
+  // });
+
+  // await page.goto(TOOL.url);
+  // await page.waitForSelector(TOOL.urlInputSelector);
+  await page.goto(`${TOOL.url}?url=${url}`);//, {waitUntil: 'networkidle2'});
+
+  // const inputHandle = await page.$(TOOL.urlInputSelector);
+  // await inputHandle.type(url);
+  // await inputHandle.press('Enter'); // Run it!
 
   await page.waitForSelector('.results', {timeout: 60 * 1000});
+  await page.waitForSelector('[data-scene="SceneTwo"]', {visible: true});
+  // await page.waitFor(10000);
 
   const obj = {
     tool: 'TMS',

@@ -35,7 +35,6 @@ async function run(browser, url) {
   // const inputHandle = await page.$(TOOL.urlInputSelector);
   // await inputHandle.type(url);
   // await inputHandle.press('Enter'); // Run it!
-
   await page.waitForSelector('#page-speed-insights.results', {timeout: 10 * 1000});
 
   const obj = {

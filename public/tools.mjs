@@ -67,7 +67,7 @@ const runners = {
     name: 'Puppeteer',
     desc: `A high-level Node API to control headless/full
            Chrome (or Chromium) over the DevTools Protocol.`,
-    url: 'https://developers.google.com/web/tools/puppeteer/',
+    url: 'https://try-puppeteer.appspot.com',
     primary: false,
   },
   CRUX: {
