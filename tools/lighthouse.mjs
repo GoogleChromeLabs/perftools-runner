@@ -16,7 +16,9 @@
 
 import lighthouse from 'lighthouse';
 import ReportGeneratorV2 from 'lighthouse/lighthouse-core/report/v2/report-generator';
-import chromeLauncher from 'chrome-launcher';
+// import chromeLauncher from 'chrome-launcher';
+import url from 'url';
+const {URL} = url;
 import * as tools from '../public/tools.mjs';
 
 /**
@@ -30,15 +32,15 @@ async function run(browser, url) {
     chromeFlags: ['--headless'],
     // logLevel: 'info',
     // output: 'html',
+    port: (new URL(browser.wsEndpoint())).port,
   };
-  const config = null;
 
-  const chrome = await chromeLauncher.launch({chromeFlags: opts.chromeFlags});
-  opts.port = chrome.port;
+  // const chrome = await chromeLauncher.launch({chromeFlags: opts.chromeFlags});
+  // opts.port = chrome.port;
 
-  const lhr = await lighthouse(url, opts, config);
+  const lhr = await lighthouse(url, opts, null);
   delete lhr.artifacts; // slim results.
-  await chrome.kill();
+  // await chrome.kill();
 
   const page = await browser.newPage();
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);

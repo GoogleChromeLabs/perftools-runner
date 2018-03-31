@@ -37,6 +37,15 @@ async function run(browser, url) {
   // await inputHandle.press('Enter'); // Run it!
   await page.waitForSelector('#page-speed-insights.results', {timeout: 10 * 1000});
 
+  // Expand all zippies.
+  await page.$$eval('.goog-zippy-collapsed', els => els.forEach(el => el.click()));
+  await page.waitForSelector('.result-group-body', {visible: true});
+
+  // Reset viewport to full page screenshot captures expanded content.
+  const docHeight = await page.evaluate('document.body.clientHeight');
+  const viewport = Object.assign({}, tools.DEFAULT_SCREENSHOT_VIEWPORT, {height: docHeight});
+  await page.setViewport(viewport);
+
   const obj = {
     tool: 'PSI',
     screenshot: await page.screenshot({fullPage: true}),

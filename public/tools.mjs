@@ -41,7 +41,7 @@ const runners = {
   },
   PSI: {
     name: 'PageSpeed',
-    desc: `Run to see field data for your site, alongside suggestions for
+    desc: `See field data for your site, alongside suggestions for
            common optimizations to improve it.`,
     url: 'https://developers.google.com/speed/pagespeed/insights/',
     urlInputSelector: 'input[name="url"]',
