@@ -247,7 +247,7 @@ main {
   display: initial;
 }
 .overlay-status {
-  color: var(--material-green-800);
+  color: #fff;
   margin: var(--padding);
   position: absolute;
   text-align: center;
@@ -261,7 +261,31 @@ main {
   width: 100%;
   max-width: 600px;
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
+}
+#tools-used {
+  user-select: none;
+  justify-content: space-evenly;
+  margin-bottom: var(--padding);
+}
+.tool-check {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+  font-size: 24px;
+}
+.tool-check.done {
+  opacity: 1;
+}
+.tool-check::before {
+  content: '';
+  background: url(img/ic_check_white_24px.svg) no-repeat 50% 50%;
+  background-color: var(--material-green-600);
+  padding: var(--padding);
+  border-radius: 50%;
+  margin-right: 6px;
 }
 #url {
   /* --shadow: 0 6px 6px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08); */
@@ -362,19 +386,6 @@ main {
 }
 [data-tool="CRUX"]::after {
   background-image: url(img/tool-impact-calculator.svg);
-}
-#screenshot-results {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 100;
-  justify-content: space-evenly;
-}
-#screenshot-results img {
-  height: 80vh;
 }
 .progress {
   --progress-bar-height: 9px;

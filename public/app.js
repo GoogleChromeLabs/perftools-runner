@@ -9,7 +9,6 @@ loadLogos();
 
 let selectedTools = [];
 const tools = document.querySelectorAll('.tool-container');
-const screenshotContainer = document.querySelector('#screenshot-results');
 const overlay = document.querySelector('.overlay');
 const overlayStatus = document.querySelector('.overlay-status');
 const input = document.querySelector('#url');
@@ -33,27 +32,81 @@ async function loadLogos() {
 }
 
 /**
+ * Hides the complete check icons for each tool.
+ */
+function resetCompletedChecks() {
+  const checks = document.querySelectorAll('.tool-check');
+  Array.from(checks).forEach(check => check.classList.remove('done'));
+}
+
+/**
  * Resets UI elements.
  */
 function resetUI() {
   toggleInputOverlay(true);
   Array.from(tools).forEach(tool => tool.classList.remove('selected'));
+
+  resetCompletedChecks();
+
   selectedTools = [];
-  render.renderScreenshots([], screenshotContainer);
 }
 
 /**
- * Toogles the input overlay.
+ * Toggles the input overlay.
  * @param {boolean=} clear When true, clears the input. Default is false.
  */
 function toggleInputOverlay(clear = false) {
   overlay.classList.toggle('show');
   if (overlay.classList.contains('show')) {
     input.focus();
+    render.renderToolRunCompleteIcons(selectedTools, document.querySelector('#tools-used'));
   }
   if (clear) {
     input.value = '';
   }
+}
+
+/**
+ * Starts running the selected tools and streams results back as they come.
+ * @param {!URL} url
+ * @return {!Promise<string>} Resolves when all tool results are complete with
+ *     the URL for the results PDF.
+ */
+function streamResults(url) {
+  return new Promise((resolve, reject) => {
+    const source = new EventSource(url.href);
+
+    source.addEventListener('message', e => {
+      try {
+        const msg = JSON.parse(e.data.replace(/"(.*)"/, '$1'));
+        const tool = runners[msg.tool];
+        if (tool) {
+          const check = document.querySelector(`.tool-check[data-tool="${msg.tool}"]`);
+          check.classList.add('done');
+        }
+        if (msg.completed) {
+          resetUI();
+          source.close();
+          resolve(msg.url);
+        }
+      } catch (err) {
+        console.error('Malformed stream source msg', err);
+        source.close();
+        reject(err);
+      }
+    });
+
+    source.addEventListener('open', e => {
+      // ga('send', 'event', 'Lighthouse', 'start run');
+    });
+
+    source.addEventListener('error', e => {
+      if (e.readyState === EventSource.CLOSED) {
+        source.close();
+        reject(e);
+      }
+    });
+  });
 }
 
 /**
@@ -76,6 +129,7 @@ async function go(url) {
     return;
   }
 
+  resetCompletedChecks();
   overlay.classList.add('running');
   overlayStatus.textContent = 'Testing...';
   arrow.classList.add('disabled');
@@ -84,8 +138,8 @@ async function go(url) {
   runURL.searchParams.set('url', url);
   runURL.searchParams.set('tools', selectedTools);
 
-  const tools = await fetch(runURL.href).then(resp => resp.json());
-  render.renderScreenshots(tools, screenshotContainer);
+  const pdfURL = await streamResults(runURL);
+  window.open(pdfURL);
 
   arrow.classList.remove('disabled');
   overlay.classList.remove('running');

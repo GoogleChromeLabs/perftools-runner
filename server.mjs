@@ -152,7 +152,7 @@ function createHTML(results) {
  * @param {string} origin Origin of the server.
  * @param {!Browser} browser
  * @param {string} filename
- * @return {!Promise}
+ * @return {!Promise<string>} URL of the created PDF.
  */
 async function createPDF(origin, browser, filename) {
   const page = await browser.newPage();
@@ -160,12 +160,16 @@ async function createPDF(origin, browser, filename) {
   await page.emulateMedia('screen');
   await page.goto(`${origin}/${filename}`, {waitUntil: 'load'});
 
+  const pdfFilename = filename.replace('.html', '.pdf');
+
   await page.pdf({
-    path: `./tmp/${filename.replace('.html', '.pdf')}`,
+    path: `./tmp/${pdfFilename}`,
     margin: {top: '16px', right: '16px', bottom: '16px', left: '16px'},
   });
 
   await page.close();
+
+  return `${origin}/${pdfFilename}`;
 }
 
 // app.use(function forceSSL(req, res, next) {
@@ -222,16 +226,29 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     throw err;
   }
 
-  const browser = await puppeteer.launch({
-    headless,
-    // slowMo: 200
+  // Send headers for event-stream connection.
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
   });
+
+  const browser = await puppeteer.launch({headless});
 
   try {
     tools = tools.filter(tool => Object.keys(runners).includes(tool));
-    const toolsToRun = tools.map(tool => eval(`${tool}Tool`).run(browser, url));
+    const toolsToRun = tools.map(tool => {
+      console.info(`Started running ${tool}...`);
 
-    console.info(`Starting new tool run with ${tools}...`);
+      return eval(`${tool}Tool`).run(browser, url).then(results => {
+        console.info(`Finished running ${tool}.`);
+
+        res.write(`data: "${JSON.stringify({tool})}"\n\n`);
+        // res.flush();
+
+        return results;
+      });
+    });
 
     const results = await Promise.all(toolsToRun);
     for (const {tool, screenshot} of results) {
@@ -240,10 +257,14 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
 
     // Save HTML page of results and create PDF from it using Puppeteer.
     await util.promisify(fs.writeFile)('./tmp/results.html', createHTML(results));
-    await createPDF(req.getOrigin(), browser, 'results.html');
+    const pdfURL = await createPDF(req.getOrigin(), browser, 'results.html');
 
-    // return res.type('image/png').send(screenshots);
-    return res.status(200).send(tools);
+    res.write(`data: "${JSON.stringify({
+      completed: true,
+      url: pdfURL,
+    })}"\n\n`);
+
+    return res.status(200).end();
   } catch (err) {
     throw err;
   } finally {

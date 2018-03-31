@@ -1,6 +1,7 @@
 import {html, render} from '../lit-html/lit-html.js';
 import {repeat} from '../lit-html/lib/repeat.js';
 import {unsafeHTML} from '../lit-html/lib/unsafe-html.js';
+import {runners} from './tools.mjs';
 
 /**
  * @param {string} toolKey
@@ -10,12 +11,24 @@ function toolImage(toolKey) {
 }
 
 /**
- * @param {!Array<string>} tool
+ * @param {!Array<string>} tools
  */
 function resultScreenshotTemplate(tools) {
   return html`${
     repeat(tools, (tool) => tool, (tool, i) => { // eslint-disable-line
       return html`<img src="/${tool}.png" class="tool-result">`;
+    })
+  }`;
+}
+
+/**
+ * @param {!Array<Object>} toolNames
+ */
+function toolRunCompleteIcons(toolNames) {
+  return html`${
+    repeat(toolNames, (key) => key, (key, i) => { // eslint-disable-line
+      const tool = runners[key];
+      return html`<div class="tool-check" data-tool="${key}">${tool.name}</div>`;
     })
   }`;
 }
@@ -53,13 +66,13 @@ function toolsTemplate(tools) {
   }`;
 }
 
-/**
- * @param {!Array<string>} selectedTools
- * @param {!HTMLElement} container Container to render markup into.
- */
-function renderScreenshots(selectedTools, container) {
-  render(resultScreenshotTemplate(selectedTools), container);
-}
+// /**
+//  * @param {!Array<string>} selectedTools
+//  * @param {!HTMLElement} container Container to render markup into.
+//  */
+// function renderScreenshots(selectedTools, container) {
+//   render(resultScreenshotTemplate(selectedTools), container);
+// }
 
 /**
  * @param {!Array<!Object>} tools
@@ -69,4 +82,16 @@ function renderToolCards(tools, container) {
   render(toolsTemplate(tools), container);
 }
 
-export {renderScreenshots, renderToolCards};
+/**
+ * @param {!Array<!Object>} tools
+ * @param {*} container
+ */
+function renderToolRunCompleteIcons(tools, container) {
+  render(toolRunCompleteIcons(tools), container);
+}
+
+export {
+  // renderScreenshots,
+  renderToolCards,
+  renderToolRunCompleteIcons
+};
