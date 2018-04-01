@@ -10,7 +10,6 @@ loadLogos();
 let selectedTools = [];
 const tools = document.querySelectorAll('.tool-container');
 const overlay = document.querySelector('.overlay');
-const overlayStatus = document.querySelector('.overlay-status');
 const input = document.querySelector('#url');
 const arrow = document.querySelector('.search-arrow');
 
@@ -96,9 +95,9 @@ function streamResults(url) {
       }
     });
 
-    source.addEventListener('open', e => {
-      // ga('send', 'event', 'Lighthouse', 'start run');
-    });
+    // source.addEventListener('open', e => {
+    //   // ga('send', 'event', 'Lighthouse', 'start run');
+    // });
 
     source.addEventListener('error', e => {
       if (e.readyState === EventSource.CLOSED) {
@@ -131,7 +130,6 @@ async function go(url) {
 
   resetCompletedChecks();
   overlay.classList.add('running');
-  overlayStatus.textContent = 'Testing...';
   arrow.classList.add('disabled');
 
   const runURL = new URL('/run', location);
@@ -143,7 +141,6 @@ async function go(url) {
 
   arrow.classList.remove('disabled');
   overlay.classList.remove('running');
-  overlayStatus.textContent = '';
   input.value = '';
 }
 
@@ -180,7 +177,7 @@ arrow.addEventListener('click', async e => {
   await go(input.value);
 });
 
-document.addEventListener('click', e => {
+document.addEventListener('dblclick', e => {
   if (e.target !== input && overlay.contains(e.target) &&
       overlay.classList.contains('show') &&
       !overlay.classList.contains('running')) {

@@ -11,17 +11,6 @@ function toolImage(toolKey) {
 }
 
 /**
- * @param {!Array<string>} tools
- */
-function resultScreenshotTemplate(tools) {
-  return html`${
-    repeat(tools, (tool) => tool, (tool, i) => { // eslint-disable-line
-      return html`<img src="/${tool}.png" class="tool-result">`;
-    })
-  }`;
-}
-
-/**
  * @param {!Array<Object>} toolNames
  */
 function toolRunCompleteIcons(toolNames) {
@@ -66,14 +55,6 @@ function toolsTemplate(tools) {
   }`;
 }
 
-// /**
-//  * @param {!Array<string>} selectedTools
-//  * @param {!HTMLElement} container Container to render markup into.
-//  */
-// function renderScreenshots(selectedTools, container) {
-//   render(resultScreenshotTemplate(selectedTools), container);
-// }
-
 /**
  * @param {!Array<!Object>} tools
  * @param {*} container
@@ -90,8 +71,4 @@ function renderToolRunCompleteIcons(tools, container) {
   render(toolRunCompleteIcons(tools), container);
 }
 
-export {
-  // renderScreenshots,
-  renderToolCards,
-  renderToolRunCompleteIcons
-};
+export {renderToolCards, renderToolRunCompleteIcons};
