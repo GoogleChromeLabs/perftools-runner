@@ -262,9 +262,24 @@ main {
   transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity;
   font-size: 24px;
+  position: relative;
 }
 .running .tool-check {
   opacity: 1;
+}
+.running .tool-check:not(.done)::after {
+  content: attr(data-running-time);
+  opacity: 0.6;
+  line-height: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 32px; /* width of check icon */
+  font-size: 14px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 .tool-check.done::before {
   background-image: url(img/ic_check_white_24px.svg);
@@ -360,25 +375,25 @@ main {
   width: var(--card-width);
   /* display: none; */
 }
-[data-tool="LH"]::after {
+.tool-container[data-tool="LH"]::after {
   background-image: url(img/tool-lighthouse.svg);
 }
-[data-tool="PSI"]::after {
+.tool-container[data-tool="PSI"]::after {
   background-image: url(img/tool-psi.svg);
 }
-[data-tool="WPT"]::after {
+.tool-container[data-tool="WPT"]::after {
   background-image: url(img/tool-webpagetest.svg);
 }
-[data-tool="SS"]::after {
+.tool-container[data-tool="SS"]::after {
   background-image: url(img/tool-speed-scorecard.svg);
 }
-[data-tool="TMS"]::after {
+.tool-container[data-tool="TMS"]::after {
   background-image: url(img/tool-testmysite.svg);
 }
-[data-tool="PPTR"]::after {
+.tool-container[data-tool="PPTR"]::after {
   background-image: url(img/pptr-icon.png);
 }
-[data-tool="CRUX"]::after {
+.tool-container[data-tool="CRUX"]::after {
   background-image: url(img/tool-impact-calculator.svg);
 }
 .progress {

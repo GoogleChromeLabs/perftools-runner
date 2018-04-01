@@ -34,7 +34,10 @@ async function loadLogos() {
  */
 function resetCompletedChecks() {
   const checks = document.querySelectorAll('.tool-check');
-  Array.from(checks).forEach(check => check.classList.remove('done'));
+  Array.from(checks).forEach(check => {
+    check.classList.remove('done');
+    check.dataset.runningTime = 0;
+  });
 }
 
 /**
@@ -73,6 +76,20 @@ function toggleInputOverlay(clear = false) {
 function streamResults(url) {
   return new Promise((resolve, reject) => {
     const source = new EventSource(url.href);
+
+    // Start running timers for each tool.
+    const interval = setInterval(() => {
+      const checks = Array.from(document.querySelectorAll('.tool-check[data-tool]'));
+      checks.forEach(check => {
+        if (!check.classList.contains('done')) {
+          check.dataset.runningTime = parseInt(check.dataset.runningTime || 0) + 1;
+        }
+      });
+      const allDone = checks.every(check => check.classList.contains('done'));
+      if (allDone) {
+        clearInterval(interval);
+      }
+    }, 1000);
 
     source.addEventListener('message', e => {
       try {
