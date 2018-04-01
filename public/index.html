@@ -9,6 +9,8 @@
   <meta name="author" content="Eric Bidelman">
   <!-- <link rel="icon" sizes="192x192" href="img/firehose.png"> -->
   <!-- <link rel="shortcut icon" href="img/firehose.png"> -->
+  <link rel="modulepreload" href="./tools.mjs">
+  <link rel="modulepreload" href="./render.js">
   <link rel="shortcut icon" href="https://developers.google.com/_static/images/favicon.png">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -30,9 +32,9 @@
     <div class="tool"></div>
     <div class="tool"></div>
     <div class="tool"></div>
-    <div class="tool-container smaller"><div class="tool"></div></div>
-    <div class="tool-container smaller"><div class="tool"></div></div>
-    <div class="tool-container smaller"><div class="tool"></div></div>
+    <div class="tool-container" data-primary="false"><div class="tool"></div></div>
+    <div class="tool-container" data-primary="false"><div class="tool"></div></div>
+    <div class="tool-container" data-primary="false"><div class="tool"></div></div>
   </div>
 </main>
 

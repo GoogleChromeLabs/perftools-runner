@@ -14,19 +14,18 @@ const input = document.querySelector('#url');
 const arrow = document.querySelector('.search-arrow');
 
 /**
- * Fades in the tool screenshots.
+ * Fades in the tool screenshots one by one.
  * @return {!Promise} Resolves when the images are loaded.
  */
 async function loadLogos() {
   const logos = Array.from(document.querySelectorAll('.tool .tool-logo'));
-  const loadPromises = logos.map(logo => {
+  return logos.map(logo => {
     return new Promise(resolve => {
-      logo.addEventListener('load', e => resolve(e.target), {once: true});
+      logo.addEventListener('load', e => {
+        e.target.classList.add('loaded');
+        resolve(e.target);
+      }, {once: true});
     });
-  });
-
-  return Promise.all(loadPromises).then(logos => {
-    logos.forEach(logo => logo.classList.add('loaded'));
   });
 }
 
