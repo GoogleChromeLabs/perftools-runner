@@ -66,6 +66,7 @@ function createHTML(results) {
   const html = `
     <html>
       <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:300,400">
         <style>
           :root {
             --orange: rgb(255, 108, 0);
