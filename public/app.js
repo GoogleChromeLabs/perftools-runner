@@ -195,7 +195,7 @@ Array.from(tools).forEach(tool => {
 });
 
 input.addEventListener('keydown', async e => {
-  if (e.keyCode !== 13) { // Enter
+  if (e.keyCode !== 13 || overlay.classList.contains('running')) {
     return;
   }
   await go(e.target.value);
