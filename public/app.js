@@ -1,3 +1,5 @@
+/* global gtag */
+
 import * as render from './render.js';
 import {runners} from './tools.mjs';
 
@@ -152,8 +154,19 @@ async function go(url) {
   runURL.searchParams.set('url', url);
   runURL.searchParams.set('tools', selectedTools);
 
+  gtag('event', 'start', {event_category: 'tool'});
+  selectedTools.forEach(tool => {
+    gtag('event', 'run', {
+      event_category: 'tool',
+      event_label: tool,
+      value: 1,
+    });
+  });
+
   const pdfURL = await streamResults(runURL);
   window.open(pdfURL);
+
+  gtag('event', 'complete', {event_category: 'tool'});
 
   arrow.classList.remove('disabled');
   overlay.classList.remove('running');
