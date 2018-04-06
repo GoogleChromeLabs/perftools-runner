@@ -233,7 +233,11 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     'Connection': 'keep-alive',
   });
 
-  const browser = await puppeteer.launch({headless});
+  const browser = await puppeteer.launch({
+    headless,
+    // dumpio: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
 
   try {
     tools = tools.filter(tool => Object.keys(runners).includes(tool));
