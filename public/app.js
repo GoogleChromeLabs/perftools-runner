@@ -80,17 +80,17 @@ function streamResults(url) {
     const source = new EventSource(url.href);
 
     // Start running timers for each tool.
+    const checks = Array.from(document.querySelectorAll('.tool-check[data-tool]'));
     const interval = setInterval(() => {
-      const checks = Array.from(document.querySelectorAll('.tool-check[data-tool]'));
       checks.forEach(check => {
         if (!check.classList.contains('done')) {
           check.dataset.runningTime = parseInt(check.dataset.runningTime || 0) + 1;
         }
       });
-      const allDone = checks.every(check => check.classList.contains('done'));
-      if (allDone) {
-        clearInterval(interval);
-      }
+      // const allDone = checks.every(check => check.classList.contains('done'));
+      // if (allDone) {
+      //   clearInterval(interval);
+      // }
     }, 1000);
 
     source.addEventListener('message', e => {
@@ -102,9 +102,14 @@ function streamResults(url) {
           check.classList.add('done');
         }
         if (msg.completed) {
-          resetUI();
-          source.close();
-          resolve(msg.url);
+          clearInterval(interval);
+          checks.forEach(check => check.classList.add('done'));
+          // Show completed check marks for a second before opening the results.
+          setTimeout(() => {
+            resetUI();
+            source.close();
+            resolve(msg.url);
+          }, 500);
         }
       } catch (err) {
         console.error('Malformed stream source msg', err);
