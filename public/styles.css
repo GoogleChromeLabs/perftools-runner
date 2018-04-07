@@ -36,6 +36,7 @@ body {
   line-height: 1.6;
   font-weight: 300;
   background-color: var(--material-blue-grey-900);
+  overflow: hidden;
 }
 a {
   color: var(--material-blue-grey-dark);
