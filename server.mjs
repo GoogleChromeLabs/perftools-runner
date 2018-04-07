@@ -232,6 +232,7 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no', // Forces GAE to keep connection open for event streaming.
   });
 
   const browser = await puppeteer.launch({
