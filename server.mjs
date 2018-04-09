@@ -37,10 +37,15 @@ const catchAsyncErrors = (fn) => (req, res, next) => {
 
 // eslint-disable-next-line require-jsdoc
 function errorHandler(err, req, res, next) {
-  if (res.headersSent) {
-    return next(err);
-  }
-  res.status(500).send({errors: `Error running your code. ${err}`});
+  console.error(err.message);
+  // if (res.headersSent) {
+  //   return next(err);
+  // }
+  res.write(`data: "${JSON.stringify({
+    errors: `Error running your code. ${err}`
+  })}"\n\n`);
+
+  res.status(500).end();//send({errors: `Error running your code. ${err}`});
 }
 
 /**
@@ -219,14 +224,6 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
   // Clear previous run screenshots.
   const paths = await del(['tmp/*']); // eslint-disable-line
 
-  // Check if URL exists before kicking off the tools.
-  // Attempt to fetch the user's URL.
-  try {
-    await fetch(url);
-  } catch (err) {
-    throw err;
-  }
-
   // Send headers for event-stream connection.
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -234,6 +231,14 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     'Connection': 'keep-alive',
     'X-Accel-Buffering': 'no', // Forces GAE to keep connection open for event streaming.
   });
+
+  // Check if URL exists before kicking off the tools.
+  // Attempt to fetch the user's URL.
+  try {
+    await fetch(url);
+  } catch (err) {
+    throw err;
+  }
 
   const browser = await puppeteer.launch({
     headless,

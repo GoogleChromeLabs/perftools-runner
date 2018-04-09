@@ -111,8 +111,10 @@ function streamResults(url) {
             resolve(msg.url);
           }, 500);
         }
+        if (msg.errors) {
+          throw new Error(msg.errors);
+        }
       } catch (err) {
-        console.error('Malformed stream source msg', err);
         source.close();
         reject(err);
       }
@@ -168,10 +170,14 @@ async function go(url) {
     });
   });
 
-  const pdfURL = await streamResults(runURL);
-  window.open(pdfURL);
+  try {
+    const pdfURL = await streamResults(runURL);
+    window.open(pdfURL);
 
-  gtag('event', 'complete', {event_category: 'tool'});
+    gtag('event', 'complete', {event_category: 'tool'});
+  } catch (err) {
+    alert(`Error while streaming results:\n\n${err}`);
+  }
 
   arrow.classList.remove('disabled');
   overlay.classList.remove('running');
