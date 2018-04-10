@@ -19,7 +19,7 @@ const {URL} = url;
 import fetch from 'node-fetch';
 import * as tools from '../public/tools.mjs';
 
-const WPT_API_KEY = 'A.04c7244ba25a5d6d717b0343a821aa59';
+const API_KEY = '7dce091be3b64d95b7812bb5211ad5a9';//'A.04c7244ba25a5d6d717b0343a821aa59';
 // const TOOL = tools.runners['WPT'];
 // const WPT_PR_MAP = new Map();
 
@@ -33,17 +33,25 @@ const WPT_API_KEY = 'A.04c7244ba25a5d6d717b0343a821aa59';
 */
 async function startOnWebpageTest(testUrl, pingback = null) {
   const wptUrl = new URL('https://www.webpagetest.org/runtest.php');
-  wptUrl.searchParams.set('k', WPT_API_KEY);
+  wptUrl.searchParams.set('k', API_KEY);
   wptUrl.searchParams.set('f', 'json');
   if (pingback) {
-    wptUrl.searchParams.set('pingback', pingback); // The pingback is passed an "id" parameter of the test.
+    // The test id is passed back with the pingback URL as a "id" query param.
+    wptUrl.searchParams.set('pingback', pingback);
   }
   // These emulation settings should match LH settings.
-  wptUrl.searchParams.set('location', 'Dulles_Nexus5:Nexus 5 - Chrome Canary.3GFast');
-  // wptUrl.searchParams.set('location', 'Dulles_Nexus5:Nexus 5 - Chrome Beta.3G_EM');
+  // wptUrl.searchParams.set('location', 'Dulles_Nexus5:Nexus 5 - Chrome Canary.3GFast');
+  wptUrl.searchParams.set('location', 'Dulles_MotoG4:MotoG4 - Chrome Canary.3GFast');
   // wptUrl.searchParams.set('mobile', 1); // Emulate mobile (for desktop cases).
   // wptUrl.searchParams.set('type', 'lighthouse'); // LH-only run.
-  wptUrl.searchParams.set('lighthouse', 1);
+
+  wptUrl.searchParams.set('fvonly', 1); // skips the repeat view and will cut the run time in half
+  // wptUrl.searchParams.set('video', 1); // include video filmstrips which are one of the most important features
+  // wptUrl.searchParams.set('timeline', 1); // include main-thread activity and js execution info in the waterfalls
+  wptUrl.searchParams.set('priority', 0); // top priority, head of queue.
+  wptUrl.searchParams.set('runs', 1); // number of tests to run.
+
+  // wptUrl.searchParams.set('lighthouse', 1); // include LH results.
   wptUrl.searchParams.set('url', testUrl);
 
   try {
