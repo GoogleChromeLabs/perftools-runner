@@ -246,6 +246,9 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
 
+  // If on Mac, use DPR=2 so screenshots are gorgeous.
+  DEFAULT_SCREENSHOT_VIEWPORT.deviceScaleFactor = process.platform === 'darwin' ? 2 : 1;
+
   try {
     tools = tools.filter(tool => Object.keys(runners).includes(tool));
     const toolsToRun = tools.map(tool => {

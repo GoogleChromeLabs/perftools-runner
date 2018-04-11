@@ -17,7 +17,7 @@
 const DEFAULT_SCREENSHOT_VIEWPORT = {
   width: 1280,
   height: 1024,
-  deviceScaleFactor: 2,
+  deviceScaleFactor: 1, // Can't use 0. See github.com/GoogleChrome/puppeteer/issues/2358.
 };
 
 const runners = {
