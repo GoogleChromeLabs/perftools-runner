@@ -41,7 +41,7 @@ async function startOnWebpageTest(testUrl, pingback = null) {
   }
   // These emulation settings should match LH settings.
   // wptUrl.searchParams.set('location', 'Dulles_Nexus5:Nexus 5 - Chrome Canary.3GFast');
-  wptUrl.searchParams.set('location', 'Dulles_MotoG4:MotoG4 - Chrome Canary.3GFast');
+  wptUrl.searchParams.set('location', 'Dulles_MotoG4:MotoG4 - Chrome.3GFast');
   // wptUrl.searchParams.set('mobile', 1); // Emulate mobile (for desktop cases).
   // wptUrl.searchParams.set('type', 'lighthouse'); // LH-only run.
 
