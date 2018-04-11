@@ -269,7 +269,7 @@ main {
   opacity: 1;
 }
 .running .tool-check:not(.done)::after {
-  content: attr(data-running-time);
+  content: attr(data-running-time) 's';
   opacity: 0.6;
   line-height: 1;
   position: absolute;
@@ -290,8 +290,8 @@ main {
 .tool-check::before {
   content: '';
   background: url(img/oval.svg) no-repeat 50% 50%;
-  background-size: contain;
-  /* background-color: #fff; */
+  /* background-size: contain; */
+  background-size: 34px;
   padding: var(--padding);
   border-radius: 50%;
   margin-right: 6px;
