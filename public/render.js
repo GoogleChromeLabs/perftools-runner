@@ -4,25 +4,6 @@ import {unsafeHTML} from '../lit-html/lib/unsafe-html.js';
 import {runners} from './tools.mjs';
 
 /**
- * @param {string} toolKey
- */
-function toolImage(toolKey) {
-  return html`<img src="img/${toolKey}-screenshot.png" class="tool-logo">`;
-}
-
-/**
- * @param {!Array<Object>} toolNames
- */
-function toolRunCompleteIcons(toolNames) {
-  return html`${
-    repeat(toolNames, (key) => key, (key, i) => { // eslint-disable-line
-      const tool = runners[key];
-      return html`<div class="tool-check" data-tool="${key}">${tool.name}</div>`;
-    })
-  }`;
-}
-
-/**
  * @param {string} key
  * @param {string} tool
  */
@@ -34,9 +15,9 @@ function toolTemplate(key, tool) {
         <div class="tool-header">
           <span class="tool-name layout center-center">
             <span>${unsafeHTML(tool.name)}</span>
-            <img src="img/ic_open_in_new_black_24px.svg" class="external-link-icon">
+            <img src="/img/ic_open_in_new_black_24px.svg" class="external-link-icon">
           </span>
-          ${toolImage(key)}
+          <img src="/img/${key}-screenshot.png" class="tool-logo">
         </div>
         <div class="tool-summary">${tool.desc}</div>
       </div>
@@ -45,22 +26,35 @@ function toolTemplate(key, tool) {
 
 /**
  * @param {!Array<!Object>} tools
+ * @param {*} container
  */
-function toolsTemplate(tools) {
-  return html`${
-    repeat(tools, (item) => item[0], (item, i) => { // eslint-disable-line
+function renderToolCards(tools, container) {
+  const primaryTools = tools.filter(t => t[1].primary);
+  const topRow = html`${
+    repeat(primaryTools, (item) => item[0], (item, i) => { // eslint-disable-line
       const [key, tool] = item;
       return toolTemplate(key, tool);
     })
   }`;
-}
 
-/**
- * @param {!Array<!Object>} tools
- * @param {*} container
- */
-function renderToolCards(tools, container) {
-  render(toolsTemplate(tools), container);
+  const secondaryTools = tools.filter(t => !t[1].primary);
+  const bottomRow = html`${
+    repeat(secondaryTools, (item) => item[0], (item, i) => { // eslint-disable-line
+      const [key, tool] = item;
+      return toolTemplate(key, tool);
+    })
+  }`;
+
+  const tmpl = html`
+    <div class="layout toprow">
+      ${topRow}
+    </div>
+    <div class="layout bottomrow">
+      ${bottomRow}
+    </div>
+  `;
+
+  render(tmpl, container);
 }
 
 /**
@@ -68,7 +62,14 @@ function renderToolCards(tools, container) {
  * @param {*} container
  */
 function renderToolRunCompleteIcons(tools, container) {
-  render(toolRunCompleteIcons(tools), container);
+  const tmpl = html`${
+    repeat(tools, (key) => key, (key, i) => { // eslint-disable-line
+      const tool = runners[key];
+      return html`<div class="tool-check" data-tool="${key}">${tool.name}</div>`;
+    })
+  }`;
+
+  render(tmpl, container);
 }
 
 export {renderToolCards, renderToolRunCompleteIcons};

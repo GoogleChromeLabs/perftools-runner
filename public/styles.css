@@ -83,9 +83,10 @@ main {
   height: 100vh;
 }
 #tools {
-  flex-wrap: wrap;
-  justify-content: center;
   margin: calc(var(--padding) * 3) 0 0 0;
+}
+#tools .toprow {
+  margin-bottom: calc(var(--padding) * 3);
 }
 .tool {
   width: var(--card-size);
@@ -99,6 +100,9 @@ main {
 }
 .tool-container {
   margin: 0 var(--padding) 0 0;
+}
+.tool-container:last-of-type {
+  margin-right: 0;
 }
 .tool-container[data-primary="false"] .tool {
   --card-width: 250px;
@@ -142,9 +146,6 @@ main {
 .tool-container.selected .tool {
   border-color: var(--material-blue-grey-50);
   border-width: var(--padding);
-}
-.tool-container[data-primary="true"] {
-  margin-bottom: calc(var(--padding) * 3);
 }
 .tool:hover .tool-name {
   opacity: 1;
