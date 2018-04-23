@@ -18,15 +18,24 @@ import del from 'del';
 import fs from 'fs';
 import util from 'util';
 import express from 'express';
+import fetch from 'node-fetch';
+import firebaseAdmin from 'firebase-admin';
+
 import puppeteer from 'puppeteer';
+import {runners, DEFAULT_SCREENSHOT_VIEWPORT} from './public/tools.mjs';
+
 /* eslint-disable no-unused-vars */
 import * as LHTool from './tools/lighthouse.mjs';
 import * as TMSTool from './tools/tms.mjs';
 import * as WPTTool from './tools/wpt.mjs';
 import * as PSITool from './tools/psi.mjs';
-/* eslint-enable no-unused-vars */
-import {runners, DEFAULT_SCREENSHOT_VIEWPORT} from './public/tools.mjs';
-import fetch from 'node-fetch';
+
+const CS_BUCKET = 'perf-sandbox.appspot.com';
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(
+    JSON.parse(fs.readFileSync('./serviceAccount.json'))),
+  storageBucket: CS_BUCKET,
+});
 
 const app = express();
 
@@ -42,7 +51,7 @@ function errorHandler(err, req, res, next) {
   //   return next(err);
   // }
   res.write(`data: "${JSON.stringify({
-    errors: `Error running your code. ${err}`
+    errors: `Error running your code. ${err}`,
   })}"\n\n`);
 
   res.status(500).end();//send({errors: `Error running your code. ${err}`});
@@ -158,7 +167,7 @@ function createHTML(results) {
  * @param {string} origin Origin of the server.
  * @param {!Browser} browser
  * @param {string} filename
- * @return {!Promise<string>} URL of the created PDF.
+ * @return {!Promise<{buffer: !Buffer, url: string, path: string}>} Created PDF metdata.
  */
 async function createPDF(origin, browser, filename) {
   const page = await browser.newPage();
@@ -166,16 +175,42 @@ async function createPDF(origin, browser, filename) {
   await page.emulateMedia('screen');
   await page.goto(`${origin}/${filename}`, {waitUntil: 'load'});
 
-  const pdfFilename = filename.replace('.html', '.pdf');
+  const pdfFilename = `${Date.now()}.${filename.replace('.html', '.pdf')}`;
 
-  await page.pdf({
-    path: `./tmp/${pdfFilename}`,
+  const path = `./tmp/${pdfFilename}`;
+  const buffer = await page.pdf({
+    path,
     margin: {top: '16px', right: '16px', bottom: '16px', left: '16px'},
   });
 
   await page.close();
 
-  return `${origin}/${pdfFilename}`;
+  return {
+    buffer,
+    url: `${origin}/${pdfFilename}`,
+    path,
+    filename: pdfFilename,
+  };
+}
+
+/**
+ * Uploads the PDF to Firebase cloud storage.
+ * @param {!Object} pdf PDF to upload.
+ * @return {string} URL of the file in cloud storage.
+ */
+async function uploadPDF(pdf) {
+  try {
+    const bucket = firebaseAdmin.storage().bucket();
+    // await file.makePublic();
+    // const [metadata] = await file.getMetadata();
+    // return metadata.mediaLink;
+    const [file, response] = await bucket.upload(pdf.path, {public: true});
+    return `https://storage.googleapis.com/${CS_BUCKET}/${pdf.filename}`;
+  } catch (err) {
+    console.error('Error uploading PDF:', err);
+  }
+
+  return null;
 }
 
 // app.use(function forceSSL(req, res, next) {
@@ -271,11 +306,14 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
 
     // Save HTML page of results and create PDF from it using Puppeteer.
     await util.promisify(fs.writeFile)('./tmp/results.html', createHTML(results));
-    const pdfURL = await createPDF(req.getOrigin(), browser, 'results.html');
+    const pdf = await createPDF(req.getOrigin(), browser, 'results.html');
+
+    const pdfURL = await uploadPDF(pdf);
 
     res.write(`data: "${JSON.stringify({
       completed: true,
-      url: pdfURL,
+      viewURL: pdf.url,
+      downloadURL: pdfURL,
     })}"\n\n`);
 
     return res.status(200).end();

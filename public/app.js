@@ -94,7 +94,7 @@ function streamResults(url) {
           setTimeout(() => {
             resetUI();
             source.close();
-            resolve(msg.url);
+            resolve(msg);
           }, 500);
         }
         if (msg.errors) {
@@ -159,8 +159,8 @@ async function go(url) {
   });
 
   try {
-    const pdfURL = await streamResults(runURL);
-    window.open(pdfURL);
+    const {downloadURL} = await streamResults(runURL);
+    window.open(downloadURL);
 
     gtag('event', 'complete', {event_category: 'tool'});
   } catch (err) {
