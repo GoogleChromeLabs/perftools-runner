@@ -24,6 +24,8 @@
   --material-green-900: #1B5E20;
   --material-green-A100: #B9F6CA;
   --material-green-A700: #00C853;
+  --material-amber-500: #FFC107;
+
   --card-size: 375px;
   --card-size-scale-factor: 0.6;
 }
@@ -82,11 +84,12 @@ header h1 {
 main {
   height: 100vh;
 }
-#tools {
-  margin: calc(var(--padding) * 3) 0 0 0;
-}
 #tools .toprow {
-  margin-bottom: calc(var(--padding) * 3);
+  margin: calc(var(--padding) * 3) 0;
+}
+#tools .bottomrow {
+  border-top: 6px solid var(--material-blue-grey-800);
+  padding-top: calc(var(--padding) * 2);
 }
 .tool {
   width: var(--card-size);
@@ -144,7 +147,7 @@ main {
   filter: drop-shadow(0 0 10px black);
 }
 .tool-container.selected .tool {
-  border-color: var(--material-blue-grey-50);
+  border-color: var(--material-amber-500);
   border-width: var(--padding);
 }
 .tool:hover .tool-name {
@@ -242,20 +245,21 @@ main {
   display: initial;
 }
 .url-section {
-  --url-section-height: 100px;
+  --url-section-height: 90px;
   --url-section-border-radius: calc(var(--url-section-height) / 2);
   width: 100%;
   max-width: 600px;
   position: relative;
+  margin-top: var(--padding);
+  margin-bottom: calc(var(--padding) * 5);
   /* overflow: hidden; */
 }
 #tools-used {
   user-select: none;
   justify-content: space-evenly;
-  margin-bottom: var(--padding);
+  margin-top: var(--padding);
   position: absolute;
   width: 100%;
-  bottom: 100%;
 }
 .tool-check {
   display: flex;

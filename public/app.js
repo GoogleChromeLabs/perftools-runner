@@ -4,14 +4,15 @@ import * as render from './render.js';
 import {runners} from './tools.mjs';
 
 // Render main HTML before anything else.
-const container = document.querySelector('#tools');
-render.renderToolCards(Object.entries(runners), container);
+const primaryTools = Object.entries(runners).filter(t => t[1].primary);
+render.renderToolCards(primaryTools, document.querySelector('#tools .toprow'));
+const secondaryTools = Object.entries(runners).filter(t => !t[1].primary);
+render.renderToolCards(secondaryTools, document.querySelector('#tools .bottomrow'));
 
 loadLogos();
 
 let selectedTools = [];
 const tools = document.querySelectorAll('.tool-container');
-const overlay = document.querySelector('.overlay');
 const input = document.querySelector('#url');
 const arrow = document.querySelector('.search-arrow');
 
@@ -46,27 +47,12 @@ function resetCompletedChecks() {
  * Resets UI elements.
  */
 function resetUI() {
-  toggleInputOverlay(true);
   Array.from(tools).forEach(tool => tool.classList.remove('selected'));
-
   resetCompletedChecks();
-
   selectedTools = [];
-}
-
-/**
- * Toggles the input overlay.
- * @param {boolean=} clear When true, clears the input. Default is false.
- */
-function toggleInputOverlay(clear = false) {
-  overlay.classList.toggle('show');
-  if (overlay.classList.contains('show')) {
-    input.focus();
-    render.renderToolRunCompleteIcons(selectedTools, document.querySelector('#tools-used'));
-  }
-  if (clear) {
-    input.value = '';
-  }
+  arrow.classList.remove('disabled');
+  document.body.classList.remove('running');
+  input.value = '';
 }
 
 /**
@@ -153,8 +139,10 @@ async function go(url) {
     return;
   }
 
+  render.renderToolRunCompleteIcons(selectedTools, document.querySelector('#tools-used'));
+
   resetCompletedChecks();
-  overlay.classList.add('running');
+  document.body.classList.add('running');
   arrow.classList.add('disabled');
 
   const runURL = new URL('/run', location);
@@ -179,9 +167,7 @@ async function go(url) {
     alert(`Error while streaming results:\n\n${err}`);
   }
 
-  arrow.classList.remove('disabled');
-  overlay.classList.remove('running');
-  input.value = '';
+  resetUI();
 }
 
 Array.from(tools).forEach(tool => {
@@ -206,7 +192,7 @@ Array.from(tools).forEach(tool => {
 });
 
 input.addEventListener('keydown', async e => {
-  if (e.keyCode !== 13 || overlay.classList.contains('running')) {
+  if (e.keyCode !== 13 || document.body.classList.contains('running')) {
     return;
   }
   await go(e.target.value);
@@ -217,41 +203,9 @@ arrow.addEventListener('click', async e => {
   await go(input.value);
 });
 
-document.addEventListener('dblclick', e => {
-  if (e.target !== input && overlay.contains(e.target) &&
-      overlay.classList.contains('show') &&
-      !overlay.classList.contains('running')) {
-    resetUI();
-  }
-});
-
 document.addEventListener('keydown', e => {
-  if (e.keyCode === 27) { // ESC
-    if (overlay.classList.contains('show') &&
-        !overlay.classList.contains('running')) {
-      resetUI();
-    }
+  if (e.keyCode === 27 && !document.body.classList.contains('running')) { // ESC
+    resetUI();
     return;
-  }
-
-  if (e.target === input) {
-    return;
-  }
-
-  switch (e.keyCode) {
-    case 32: // space
-      if (!selectedTools.length) {
-        alert('Please select a tool');
-        return;
-      }
-      toggleInputOverlay();
-      break;
-    case 37: // left arrow
-      // TODO: move to previous tool
-      break;
-    // case 32: // space
-    case 39: // right arrow
-      // TODO: move to next tool
-      break;
   }
 });

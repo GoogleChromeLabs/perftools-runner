@@ -29,32 +29,14 @@ function toolTemplate(key, tool) {
  * @param {*} container
  */
 function renderToolCards(tools, container) {
-  const primaryTools = tools.filter(t => t[1].primary);
-  const topRow = html`${
-    repeat(primaryTools, (item) => item[0], (item, i) => { // eslint-disable-line
+  const row = html`${
+    repeat(tools, (item) => item[0], (item, i) => { // eslint-disable-line
       const [key, tool] = item;
       return toolTemplate(key, tool);
     })
   }`;
 
-  const secondaryTools = tools.filter(t => !t[1].primary);
-  const bottomRow = html`${
-    repeat(secondaryTools, (item) => item[0], (item, i) => { // eslint-disable-line
-      const [key, tool] = item;
-      return toolTemplate(key, tool);
-    })
-  }`;
-
-  const tmpl = html`
-    <div class="layout toprow">
-      ${topRow}
-    </div>
-    <div class="layout bottomrow">
-      ${bottomRow}
-    </div>
-  `;
-
-  render(tmpl, container);
+  render(row, container);
 }
 
 /**
