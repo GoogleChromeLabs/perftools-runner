@@ -15,6 +15,7 @@ let selectedTools = [];
 const tools = document.querySelectorAll('.tool-container');
 const input = document.querySelector('#url');
 const arrow = document.querySelector('.search-arrow');
+const reportLink = document.querySelector('#report-link a');
 
 /**
  * Fades in the tool screenshots one by one.
@@ -90,12 +91,8 @@ function streamResults(url) {
         if (msg.completed) {
           clearInterval(interval);
           checks.forEach(check => check.classList.add('done'));
-          // Show completed check marks for a second before opening the results.
-          setTimeout(() => {
-            resetUI();
-            source.close();
-            resolve(msg);
-          }, 500);
+          source.close();
+          resolve(msg);
         }
         if (msg.errors) {
           throw new Error(msg.errors);
@@ -131,6 +128,8 @@ async function go(url) {
     input.value = url;
   }
 
+  document.body.classList.remove('report'); // Remove report link when run starts.
+
   if (!url.length || !input.validity.valid) {
     alert('URL is not valid');
     return;
@@ -139,9 +138,10 @@ async function go(url) {
     return;
   }
 
+  // Reset some UI elements.
   render.renderToolRunCompleteIcons(selectedTools, document.querySelector('#tools-used'));
-
   resetCompletedChecks();
+
   document.body.classList.add('running');
   arrow.classList.add('disabled');
 
@@ -159,8 +159,16 @@ async function go(url) {
   });
 
   try {
-    const {downloadURL} = await streamResults(runURL);
-    window.open(downloadURL);
+    const {shortenedURL} = await streamResults(runURL);
+
+    reportLink.href = shortenedURL;
+    reportLink.textContent = shortenedURL;
+    document.body.classList.add('report');
+
+    // Show completed check marks for a second before opening the results.
+    setTimeout(() => {
+      document.body.classList.remove('running');
+    }, 500);
 
     gtag('event', 'complete', {event_category: 'tool'});
   } catch (err) {

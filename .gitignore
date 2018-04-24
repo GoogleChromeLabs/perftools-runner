@@ -3,3 +3,4 @@ node_modules
 *-error.log
 tmp/
 serviceAccount.json
+bitlyAccount.json

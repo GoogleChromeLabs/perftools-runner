@@ -25,6 +25,7 @@
   --material-green-A100: #B9F6CA;
   --material-green-A700: #00C853;
   --material-amber-500: #FFC107;
+  --material-team-A400: #1DE9B6;
 
   --card-size: 375px;
   --card-size-scale-factor: 0.6;
@@ -86,6 +87,7 @@ main {
 }
 #tools .toprow {
   margin: calc(var(--padding) * 3) 0;
+  flex-shrink: 0;
 }
 #tools .bottomrow {
   border-top: 6px solid var(--material-blue-grey-800);
@@ -251,8 +253,24 @@ main {
   max-width: 600px;
   position: relative;
   margin-top: var(--padding);
-  margin-bottom: calc(var(--padding) * 5);
+  margin-bottom: calc(var(--padding) * 2);
   /* overflow: hidden; */
+}
+#report-link {
+  margin-top: var(--padding);
+  opacity: 0;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity;
+}
+#report-link a {
+  color: var(--material-team-A400);
+  margin-left: var(--padding);
+}
+body.report #report-link {
+  opacity: 1;
+}
+#report-link {
+  font-size: 28px;
 }
 #tools-used {
   user-select: none;

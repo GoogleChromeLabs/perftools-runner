@@ -23,6 +23,7 @@ import firebaseAdmin from 'firebase-admin';
 
 import puppeteer from 'puppeteer';
 import {runners, DEFAULT_SCREENSHOT_VIEWPORT} from './public/tools.mjs';
+import * as bitly from './public/bitly.mjs';
 
 /* eslint-disable no-unused-vars */
 import * as LHTool from './tools/lighthouse.mjs';
@@ -31,6 +32,7 @@ import * as WPTTool from './tools/wpt.mjs';
 import * as PSITool from './tools/psi.mjs';
 
 const CS_BUCKET = 'perf-sandbox.appspot.com';
+
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(
     JSON.parse(fs.readFileSync('./serviceAccount.json'))),
@@ -309,11 +311,13 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     const pdf = await createPDF(req.getOrigin(), browser, 'results.html');
 
     const pdfURL = await uploadPDF(pdf);
+    const bitlyResp = await bitly.shorten(pdfURL);
 
     res.write(`data: "${JSON.stringify({
       completed: true,
       viewURL: pdf.url,
       downloadURL: pdfURL,
+      shortenedURL: bitlyResp.url.replace('http:', 'https:'),
     })}"\n\n`);
 
     return res.status(200).end();

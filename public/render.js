@@ -10,7 +10,7 @@ import {runners} from './tools.mjs';
 function toolTemplate(key, tool) {
   return html`
     <a href="${tool.url}" class="tool-container" data-primary="${tool.primary}"
-       data-tool="${key}" data-logo="${tool.logo}" tabindex="0" target="_blank">
+       data-tool="${key}" data-logo="${tool.logo}" tabindex="0" target="tool">
       <div class="tool">
         <div class="tool-header">
           <span class="tool-name layout center-center">
