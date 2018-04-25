@@ -218,6 +218,8 @@ shareAction.addEventListener('click', async e => {
     const {shortUrl} = await fetch(`/share?pdf=${viewAction.href}`).then(resp => resp.json());
     shareAction.textContent = originalText;
     shareUrlInput.value = shortUrl;
+
+    gtag('event', 'share', {event_category: 'report'});
   }
 
   overlay.classList.add('show');
@@ -227,6 +229,7 @@ copyReportURL.addEventListener('click', e => {
   navigator.clipboard.writeText(shareUrlInput.value).then(() => {
     console.log('URL copied to clipboard.');
     shareUrlInput.select();
+    gtag('event', 'copy', {event_category: 'report'});
   }).catch(err => {
     console.error('Could not copy text: ', err);
   });
