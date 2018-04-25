@@ -39,8 +39,8 @@
       </div>
       <div id="tools-used" class="layout center"><!-- filled dynamically --></div>
       <div id="report-link" class="layout center">
-        <span>View report:</span>
-        <a href="#" target="report"></a>
+        <a href="#" target="report" class="layout center-center report-action view-action">View report</a>
+        <a href="#" class="layout center-center report-action share-action">Share report</a>
       </div>
     </div>
 
@@ -52,6 +52,16 @@
     </div>
   </div>
 </main>
+
+<div class="overlay layout center-center">
+  <div class="url-section">
+    <div><h1>Your report permalink</h1></div>
+    <div class="search-arrow copy-action">
+      <img src="/img/ic_content_copy_black_24px.svg" title="Click to copy URL to the clipboard">
+    </div>
+    <input type="url">
+  </div>
+</div>
 
 <svg width="0" height="0">
   <defs>

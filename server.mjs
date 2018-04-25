@@ -197,17 +197,24 @@ async function createPDF(origin, browser, filename) {
 
 /**
  * Uploads the PDF to Firebase cloud storage.
- * @param {!Object} pdf PDF to upload.
+ * @param {string} pdfURL URL of the PDF to upload to cloud storage.
  * @return {string} URL of the file in cloud storage.
  */
-async function uploadPDF(pdf) {
+async function uploadPDF(pdfURL) {
   try {
     const bucket = firebaseAdmin.storage().bucket();
     // await file.makePublic();
     // const [metadata] = await file.getMetadata();
     // return metadata.mediaLink;
-    const [file, response] = await bucket.upload(pdf.path, {public: true});
-    return `https://storage.googleapis.com/${CS_BUCKET}/${pdf.filename}`;
+    const parts = pdfURL.split('/');
+    const filename = parts[parts.length - 1];
+
+    const [file, response] = await bucket.upload(pdfURL, {
+      public: true,
+      gzip: true,
+      validation: false,
+    });
+    return `https://storage.googleapis.com/${CS_BUCKET}/${filename}`;
   } catch (err) {
     console.error('Error uploading PDF:', err);
   }
@@ -301,23 +308,22 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
       });
     });
 
+    console.info('Taking screenshots...');
     const results = await Promise.all(toolsToRun);
     for (const {tool, screenshot} of results) {
       await util.promisify(fs.writeFile)(`./tmp/${tool}.png`, screenshot);
     }
+    console.info('Done.');
 
     // Save HTML page of results and create PDF from it using Puppeteer.
+    console.info('Creating PDF...');
     await util.promisify(fs.writeFile)('./tmp/results.html', createHTML(results));
     const pdf = await createPDF(req.getOrigin(), browser, 'results.html');
-
-    const pdfURL = await uploadPDF(pdf);
-    const bitlyResp = await bitly.shorten(pdfURL);
+    console.info('Done.');
 
     res.write(`data: "${JSON.stringify({
       completed: true,
       viewURL: pdf.url,
-      downloadURL: pdfURL,
-      shortenedURL: bitlyResp.url.replace('http:', 'https:'),
     })}"\n\n`);
 
     return res.status(200).end();
@@ -328,6 +334,28 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
   }
 
   // res.status(200).send('Done');
+}));
+
+
+app.get('/share', catchAsyncErrors(async (req, res) => {
+  const pdfURL = req.query.pdf;
+
+  if (!pdfURL) {
+    throw new Error('PDF url missing.');
+  }
+
+  console.info('Uploading PDF to Cloud Storage...');
+  const gcsURL = await uploadPDF(pdfURL);
+  console.info('Done.');
+
+  console.info('Shortening URL...');
+  const bitlyResp = await bitly.shorten(gcsURL);
+  console.info('Done.');
+
+  res.status(200).send({
+    url: gcsURL,
+    shortUrl: bitlyResp.url.replace('http:', 'https:'),
+  });
 }));
 
 app.use(errorHandler);

@@ -15,7 +15,11 @@ let selectedTools = [];
 const tools = document.querySelectorAll('.tool-container');
 const input = document.querySelector('#url');
 const arrow = document.querySelector('.search-arrow');
-const reportLink = document.querySelector('#report-link a');
+const viewAction = document.querySelector('#report-link .view-action');
+const shareAction = document.querySelector('#report-link .share-action');
+const overlay = document.querySelector('.overlay');
+const shareUrlInput = overlay.querySelector('input');
+const copyReportURL = overlay.querySelector('.copy-action img');
 
 /**
  * Fades in the tool screenshots one by one.
@@ -53,7 +57,7 @@ function resetUI() {
   selectedTools = [];
   arrow.classList.remove('disabled');
   document.body.classList.remove('running');
-  input.value = '';
+  input.value = null;
 }
 
 /**
@@ -141,6 +145,7 @@ async function go(url) {
   // Reset some UI elements.
   render.renderToolRunCompleteIcons(selectedTools, document.querySelector('#tools-used'));
   resetCompletedChecks();
+  shareUrlInput.value = null;
 
   document.body.classList.add('running');
   arrow.classList.add('disabled');
@@ -159,10 +164,9 @@ async function go(url) {
   });
 
   try {
-    const {shortenedURL} = await streamResults(runURL);
+    const {viewURL} = await streamResults(runURL);
 
-    reportLink.href = shortenedURL;
-    reportLink.textContent = shortenedURL;
+    viewAction.href = viewURL;
     document.body.classList.add('report');
 
     // Show completed check marks for a second before opening the results.
@@ -199,6 +203,39 @@ Array.from(tools).forEach(tool => {
   });
 });
 
+shareAction.addEventListener('click', async e => {
+  e.preventDefault();
+
+  if (!viewAction.href) {
+    console.warn('Report not generated yet.');
+    return;
+  }
+
+  // Don't re-upload PDF to GCS and re-shorten URL.
+  if (!shareUrlInput.value) {
+    const originalText = shareAction.textContent;
+    shareAction.textContent = 'Sharing...';
+    const {shortUrl} = await fetch(`/share?pdf=${viewAction.href}`).then(resp => resp.json());
+    shareAction.textContent = originalText;
+    shareUrlInput.value = shortUrl;
+  }
+
+  overlay.classList.add('show');
+});
+
+copyReportURL.addEventListener('click', e => {
+  navigator.clipboard.writeText(shareUrlInput.value).then(() => {
+    console.log('URL copied to clipboard.');
+    shareUrlInput.select();
+  }).catch(err => {
+    console.error('Could not copy text: ', err);
+  });
+});
+
+shareUrlInput.addEventListener('click', e => {
+  e.target.select();
+});
+
 input.addEventListener('keydown', async e => {
   if (e.keyCode !== 13 || document.body.classList.contains('running')) {
     return;
@@ -211,9 +248,16 @@ arrow.addEventListener('click', async e => {
   await go(input.value);
 });
 
+document.addEventListener('click', e => {
+  if (overlay.classList.contains('show') && e.target === overlay) {
+    overlay.classList.remove('show');
+  }
+});
+
 document.addEventListener('keydown', e => {
   if (e.keyCode === 27 && !document.body.classList.contains('running')) { // ESC
     resetUI();
+    overlay.classList.remove('show');
     return;
   }
 });
