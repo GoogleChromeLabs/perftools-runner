@@ -254,6 +254,7 @@ app.use(express.static('node_modules'));
 
 app.get('/run', catchAsyncErrors(async (req, res) => {
   const url = req.query.url;
+  const origin = req.getOrigin();
   let tools = req.query.tools ? req.query.tools.split(',') : [];
   const headless = req.query.headless === 'false' ? false : true;
 
@@ -298,10 +299,14 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     const toolsToRun = tools.map(tool => {
       console.info(`Started running ${tool}...`);
 
-      return eval(`${tool}Tool`).run(browser, url).then(results => {
+      return eval(`${tool}Tool`).run(browser, url).then(async results => {
         console.info(`Finished running ${tool}.`);
 
-        res.write(`data: "${JSON.stringify({tool})}"\n\n`);
+        await util.promisify(fs.writeFile)(`./tmp/${tool}.html`, results.html);
+
+        const reportUrl = results.url || `/${tool}.html`;
+
+        res.write(`data: "${JSON.stringify({tool, url: reportUrl})}"\n\n`);
         // res.flush();
 
         return results;
@@ -318,7 +323,7 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     // Save HTML page of results and create PDF from it using Puppeteer.
     console.info('Creating PDF...');
     await util.promisify(fs.writeFile)('./tmp/results.html', createHTML(results));
-    const pdf = await createPDF(req.getOrigin(), browser, 'results.html');
+    const pdf = await createPDF(origin, browser, 'results.html');
     console.info('Done.');
 
     res.write(`data: "${JSON.stringify({

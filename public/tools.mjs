@@ -33,7 +33,7 @@ const runners = {
   WPT: {
     name: 'WebPageTest',
     url: 'https://www.webpagetest.org/easy.php',
-    desc: `Compare performance of one or more pages in a controlled
+    desc: `Compare perf of one or more pages in a controlled
            lab environment, testing on real devices. Lighthouse is integrated
            into WebPageTest.`,
     urlInputSelector: '#url',

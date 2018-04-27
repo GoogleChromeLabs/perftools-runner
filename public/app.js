@@ -13,6 +13,7 @@ loadLogos();
 
 let selectedTools = [];
 const tools = document.querySelectorAll('.tool-container');
+const toolsUsed = document.querySelector('#tools-used');
 const input = document.querySelector('#url');
 const arrow = document.querySelector('.search-arrow');
 const viewAction = document.querySelector('#report-link .view-action');
@@ -49,11 +50,20 @@ function resetCompletedChecks() {
 }
 
 /**
+ *
+ * @param {!Array} tools Selected tools to run.
+ * @param {!HTMLElement} toolsUsed Container to render into.
+ */
+function removeCompletedChecks(tools) {
+  render.renderToolRunCompleteIcons(tools, toolsUsed);
+  resetCompletedChecks();
+}
+
+/**
  * Resets UI elements.
  */
 function resetUI() {
   Array.from(tools).forEach(tool => tool.classList.remove('selected'));
-  resetCompletedChecks();
   selectedTools = [];
   arrow.classList.remove('disabled');
   document.body.classList.remove('running');
@@ -78,10 +88,6 @@ function streamResults(url) {
           check.dataset.runningTime = parseInt(check.dataset.runningTime || 0) + 1;
         }
       });
-      // const allDone = checks.every(check => check.classList.contains('done'));
-      // if (allDone) {
-      //   clearInterval(interval);
-      // }
     }, 1000);
 
     source.addEventListener('message', e => {
@@ -91,6 +97,7 @@ function streamResults(url) {
         if (tool) {
           const check = document.querySelector(`.tool-check[data-tool="${msg.tool}"]`);
           check.classList.add('done');
+          render.renderToolReportLink({name: tool.name, report: msg.url}, check);
         }
         if (msg.completed) {
           clearInterval(interval);
@@ -133,6 +140,7 @@ async function go(url) {
   }
 
   document.body.classList.remove('report'); // Remove report link when run starts.
+  render.renderToolRunCompleteIcons([], toolsUsed);
 
   if (!url.length || !input.validity.valid) {
     alert('URL is not valid');
@@ -143,8 +151,7 @@ async function go(url) {
   }
 
   // Reset some UI elements.
-  render.renderToolRunCompleteIcons(selectedTools, document.querySelector('#tools-used'));
-  resetCompletedChecks();
+  removeCompletedChecks(selectedTools);
   shareUrlInput.value = null;
 
   document.body.classList.add('running');
@@ -168,18 +175,17 @@ async function go(url) {
 
     viewAction.href = viewURL;
     document.body.classList.add('report');
-
-    // Show completed check marks for a second before opening the results.
-    setTimeout(() => {
-      document.body.classList.remove('running');
-    }, 500);
+    document.body.classList.remove('running');
 
     gtag('event', 'complete', {event_category: 'tool'});
   } catch (err) {
     alert(`Error while streaming results:\n\n${err}`);
+    removeCompletedChecks([]);
   }
 
-  resetUI();
+  setTimeout(() => {
+    resetUI();
+  }, 500);
 }
 
 Array.from(tools).forEach(tool => {

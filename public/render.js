@@ -41,17 +41,28 @@ function renderToolCards(tools, container) {
 
 /**
  * @param {!Array<!Object>} tools
- * @param {*} container
+ * @param {!HTMLElement} container
  */
 function renderToolRunCompleteIcons(tools, container) {
   const tmpl = html`${
     repeat(tools, (key) => key, (key, i) => { // eslint-disable-line
       const tool = runners[key];
-      return html`<div class="tool-check" data-tool="${key}">${tool.name}</div>`;
+      return html`<div class="tool-check" data-tool="${key}">
+        <a href="${tool.report || '#'}" target="report">${tool.name}</a>
+      </div>`;
     })
   }`;
 
   render(tmpl, container);
 }
 
-export {renderToolCards, renderToolRunCompleteIcons};
+/**
+ * @param {!Object} tool
+ * @param {!HTMLElement} container
+ */
+function renderToolReportLink(tool, container) {
+  const tmpl = html`<a href="${tool.report || '#'}" target="report" title="Open ${tool.name} results">${tool.name}</a>`;
+  render(tmpl, container);
+}
+
+export {renderToolCards, renderToolRunCompleteIcons, renderToolReportLink};

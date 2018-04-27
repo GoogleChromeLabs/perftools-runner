@@ -100,6 +100,7 @@ async function run(browser, url) {
     tool: 'WPT',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
+    url: resultsUrl,
   };
 
   await page.close();
