@@ -244,17 +244,27 @@ main {
   visibility: visible;
   pointer-events: initial;
 }
+.overlay .url-section {
+  --qrcode-width: 425px;
+  max-width: var(--qrcode-width);
+  margin: 0;
+}
 .overlay .url-section input[type="url"] {
   border-radius: 0;
+  margin-bottom: calc(var(--padding) * 2);
 }
 .overlay .copy-action {
   cursor: copy;
+  border-radius: 0;
 }
-.overlay .url-section h1 {
+.overlay .url-section h2 {
+  margin: 0;
   margin-bottom: var(--padding);
-  text-align: center;
-  text-transform: uppercase;
   user-select: none;
+  font-weight: 300;
+}
+#qrcode {
+  width: var(--qrcode-width);
 }
 .url-section {
   --url-section-height: 70px;

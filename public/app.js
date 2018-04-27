@@ -225,6 +225,8 @@ shareAction.addEventListener('click', async e => {
     shareAction.textContent = originalText;
     shareUrlInput.value = shortUrl;
 
+    document.querySelector('#qrcode').src = `https://chart.googleapis.com/chart?chs=425x425&cht=qr&chl=${shortUrl}&choe=UTF-8`;
+
     gtag('event', 'share', {event_category: 'report'});
   }
 
