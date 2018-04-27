@@ -41,7 +41,7 @@ RUN chmod +x /usr/local/bin/dumb-init
 COPY ./tools /app/tools
 COPY ./public /app/public
 #COPY local.conf /etc/fonts/local.conf
-COPY server.mjs package.json yarn.lock /app/
+COPY server.mjs package.json yarn.lock serviceAccount.json bitlyAccount.json /app/
 
 RUN chmod +x /app/server.mjs
 
