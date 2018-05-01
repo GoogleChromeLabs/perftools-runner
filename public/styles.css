@@ -496,6 +496,12 @@ body.report #report-link {
   animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
   animation-delay: 1.15s;
 }
+footer {
+  margin-top: calc(var(--padding) * 2);
+}
+footer a {
+  color: var(--material-team-A400);
+}
 /* TODO: animate transforms instead of left/right */
 @keyframes indeterminate{
   0% {left:-35%;right:100%}
