@@ -245,7 +245,7 @@ main {
   pointer-events: initial;
 }
 .overlay .url-section {
-  --qrcode-width: 425px;
+  --qrcode-width: 450px;
   max-width: var(--qrcode-width);
   margin: 0;
 }

@@ -28,7 +28,8 @@ async function run(browser, url) {
   const page = await browser.newPage();
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
 
-  await page.goto(`${TOOL.url}?url=${url}`);
+  const resultsUrl = `${TOOL.url}?url=${url}`;
+  await page.goto(resultsUrl);
   // Type the URL into the input.
   // await page.goto(TOOL.url);
   // await page.waitForSelector(TOOL.urlInputSelector);
@@ -50,6 +51,7 @@ async function run(browser, url) {
     tool: 'PSI',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
+    url: resultsUrl,
   };
 
   await page.close();
