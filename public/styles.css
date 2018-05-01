@@ -151,6 +151,7 @@ main {
 }
 .tool-container.selected .tool {
   border-color: var(--material-amber-500);
+  /* border-color: var(--material-team-A400); */
   border-width: var(--padding);
 }
 .tool:hover .tool-name {

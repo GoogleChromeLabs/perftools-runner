@@ -67,11 +67,19 @@ function errorHandler(err, req, res, next) {
 function createHTML(results) {
   const body = results.map(r => {
     const tool = runners[r.tool];
+    const resultsLink = r.resultsUrl ? `
+      <p class="reportlink">
+        Results available at: <a href="${r.resultsUrl}" target="_blank">${r.resultsUrl}</a>
+      </p>` : '';
+
     return `
       <h3 class="title">${tool.name} results</h3>
-      <div class="desc">
-        ${tool.desc}
-        <span>Learn more: <a href="${tool.url}" target="_blank">${tool.url}</a></span>
+      <div>
+        <div class="desc">
+          About this tool: ${tool.desc}
+          Learn more at <a href="${tool.url}" target="_blank">${tool.url}</a>
+        </div>
+        ${resultsLink}
       </div>
       <div class="screenshot">
         <img src="data:img/png;base64,${r.screenshot.toString('base64')}">
@@ -129,12 +137,16 @@ function createHTML(results) {
             color: var(--orange);
             margin-top: calc(var(--padding) * 2);
           }
-          .desc {
-            font-size: 12px;
+          .reportlink, .desc {
+            font-size: 14px;
+            opacity: 0.6;
+          }
+          .reportlink {
             font-style: italic;
+          }
+          .desc {
             margin-bottom: var(--padding);
             margin-top: 4px;
-            opacity: 0.6;
           }
           .screenshot {
             /*page-break-after: always;*/
@@ -304,9 +316,9 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
 
         await util.promisify(fs.writeFile)(`./tmp/${tool}.html`, results.html);
 
-        const reportUrl = results.url || `/${tool}.html`;
+        const resultsUrl = results.resultsUrl || `/${tool}.html`;
 
-        res.write(`data: "${JSON.stringify({tool, url: reportUrl})}"\n\n`);
+        res.write(`data: "${JSON.stringify({tool, resultsUrl})}"\n\n`);
         // res.flush();
 
         return results;

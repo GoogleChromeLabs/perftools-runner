@@ -51,7 +51,7 @@ async function run(browser, url) {
     tool: 'PSI',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
-    url: resultsUrl,
+    resultsUrl,
   };
 
   await page.close();

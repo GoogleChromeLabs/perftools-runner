@@ -61,7 +61,7 @@ function renderToolRunCompleteIcons(tools, container) {
  * @param {!HTMLElement} container
  */
 function renderToolReportLink(tool, container) {
-  const tmpl = html`<a href="${tool.report || '#'}" target="report" title="Open ${tool.name} results">${tool.name}</a>`;
+  const tmpl = html`<a href="${tool.resultsUrl || '#'}" target="report" title="Open ${tool.name} results">${tool.name}</a>`;
   render(tmpl, container);
 }
 

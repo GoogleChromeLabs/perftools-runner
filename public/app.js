@@ -97,7 +97,7 @@ function streamResults(url) {
         if (tool) {
           const check = document.querySelector(`.tool-check[data-tool="${msg.tool}"]`);
           check.classList.add('done');
-          render.renderToolReportLink({name: tool.name, report: msg.url}, check);
+          render.renderToolReportLink({name: tool.name, resultsUrl: msg.resultsUrl}, check);
         }
         if (msg.completed) {
           clearInterval(interval);
