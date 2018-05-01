@@ -15,7 +15,6 @@
  */
 
 import lighthouse from 'lighthouse';
-import ReportGeneratorV2 from 'lighthouse/lighthouse-core/report/v2/report-generator';
 // import chromeLauncher from 'chrome-launcher';
 import url from 'url';
 const {URL} = url;
@@ -31,7 +30,7 @@ async function run(browser, url) {
   const opts = {
     chromeFlags: ['--headless'],
     // logLevel: 'info',
-    // output: 'html',
+    output: 'html',
     port: (new URL(browser.wsEndpoint())).port,
   };
 
@@ -39,15 +38,11 @@ async function run(browser, url) {
   // opts.port = chrome.port;
 
   const lhr = await lighthouse(url, opts, null);
-  delete lhr.artifacts; // slim results.
   // await chrome.kill();
 
   const page = await browser.newPage();
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
-
-  // Take screenshot of html results using Puppeteer.
-  const html = new ReportGeneratorV2().generateReportHtml(lhr);
-  await page.setContent(html);
+  await page.setContent(lhr.report);
 
   const obj = {
     tool: 'LH',
