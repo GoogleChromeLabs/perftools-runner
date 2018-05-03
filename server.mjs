@@ -268,6 +268,7 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
   const url = req.query.url;
   const origin = req.getOrigin();
   let tools = req.query.tools ? req.query.tools.split(',') : [];
+  tools = tools.filter(tool => Object.keys(runners).includes(tool));
   const headless = req.query.headless === 'false' ? false : true;
 
   if (!tools.length) {
@@ -297,6 +298,13 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     throw err;
   }
 
+  // Log url to file.
+  try {
+    util.promisify(fs.writeFile)('runs.txt', `${url},${tools}\n`, {flag: 'a'}); // async
+  } catch (err) {
+    console.warn(err);
+  }
+
   const browser = await puppeteer.launch({
     headless,
     // dumpio: true,
@@ -307,7 +315,6 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
   DEFAULT_SCREENSHOT_VIEWPORT.deviceScaleFactor = process.platform === 'darwin' ? 2 : 1;
 
   try {
-    tools = tools.filter(tool => Object.keys(runners).includes(tool));
     const toolsToRun = tools.map(tool => {
       console.info(`Started running ${tool}...`);
 

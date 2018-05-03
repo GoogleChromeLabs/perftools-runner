@@ -4,3 +4,4 @@ node_modules
 tmp/
 serviceAccount.json
 bitlyAccount.json
+runs.txt
