@@ -26,7 +26,8 @@ const runners = {
     url: 'https://developers.google.com/web/tools/lighthouse',
     desc: `Personalized advice on how to improve the performance, accessibility,
           PWA, SEO, and other best practices of your site.`,
-    logo: 'img/lighthouse-logo.png',
+    // logo: 'img/lighthouse-logo.png',
+    logo: '/img/tool-lighthouse.svg',
     urlInputSelector: '#url',
     primary: true,
   },
@@ -36,6 +37,7 @@ const runners = {
     desc: `Compare perf of one or more pages in a controlled
            lab environment, testing on real devices. Lighthouse is integrated
            into WebPageTest.`,
+    logo: '/img/tool-webpagetest.svg',
     urlInputSelector: '#url',
     primary: true,
   },
@@ -44,6 +46,7 @@ const runners = {
     desc: `See field data for your site, alongside suggestions for
            common optimizations to improve it.`,
     url: 'https://developers.google.com/speed/pagespeed/insights/',
+    logo: '/img/tool-psi.svg',
     urlInputSelector: 'input[name="url"]',
     primary: true,
   },

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Lighthouse &amp; Friends</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:400,500">
+  <meta name="author" content="Eric Bidelman">
+  <link rel="shortcut icon" href="https://developers.google.com/_static/images/favicon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background-color: #fff;
+      color: var(--material-blue-grey-900);
+    }
+    #url {
+      margin-bottom: calc(var(--padding) * 2);
+    }
+    gauge-element {
+      width: 160px;
+      display: inline-flex;
+    }
+    .title {
+      font-size: 5vw;
+    }
+    .result-tool {
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      color: inherit;
+      width: 300px;
+      flex-shrink: 0;
+      line-height: 2;
+    }
+    .logo {
+      height: 175px;
+    }
+    .results-row {
+      margin: calc(var(--padding) * 1) 0;
+      /* flex-shrink: 0; */
+    }
+    .screenshot {
+      object-fit: cover;
+      object-position: 0 -220px;
+      height: 200px;
+      width: 800px;
+      border: 1px solid var(--material-blue-grey-50);
+    }
+    .screenshot.wpt {
+      object-position: 0 0;
+    }
+  </style>
+</head>
+<body>
+
+<main id="container" class="layout vertical center-center">
+  <h1 class="title">👇 Enter a URL to get started. 👇</h1>
+
+  <!-- <h1 id="url">http://example.com</h1> -->
+
+  <div id="lh-results"></div>
+  <div id="psi-results"></div>
+  <div id="wpt-results"></div>
+
+   <!--
+  <div class="results-row layout center-center">
+    <div class="result-tool layout vertical center-center">
+      <img src="/img/tool-lighthouse.svg" class="logo">
+      <h1>Lighthouse</h1>
+    </div>
+    <div class="layout scores display">
+      <gauge-element score=".99">Performance</gauge-element>
+      <gauge-element score=".60">Progressive Web App</gauge-element>
+      <gauge-element score=".20">Accessibility</gauge-element>
+      <gauge-element score=".90">SEO</gauge-element>
+      <gauge-element score=".90">Best Practices</gauge-element>
+    </div>
+  </div>
+  <div class="results-row layout center-center">
+    <div class="result-tool layout vertical center-center">
+      <img src="/img/tool-psi.svg" class="logo">
+      <h1>Page Speed</h1>
+    </div>
+    <div class="layout display">
+      <a href=""></a><img src="/PSI.png" class="screenshot"></a>
+    </div>
+  </div>
+  <div class="results-row layout center-center">
+    <div class="result-tool layout vertical center-center">
+      <img src="/img/tool-webpagetest.svg" class="logo">
+      <h1>WebPage Test</h1>
+    </div>
+    <div class="layout display">
+       <img src="/WPT.png" class="screenshot wpt">
+    </div>
+  </div> -->
+
+</main>
+
+<script src="gauge-element.js" type="module"></script>
+<script>
+(async () => {
+const render = await import('./render.js');
+
+const titleEl = document.querySelector('.title');
+const lhResultsRow = document.querySelector('#lh-results');
+const psiResultsRow = document.querySelector('#psi-results');
+const wptResultsRow = document.querySelector('#wpt-results');
+
+let connectionIdx = 0;
+let messageIdx = 0;
+
+function addConnection(connection) {
+  connection.connectionId = ++connectionIdx;
+
+  connection.addEventListener('message', async e => {
+    messageIdx++;
+
+    const data = JSON.parse(e.data);
+    const msg = 'Message ' + messageIdx + ' from connection #' +
+        connection.connectionId + ': ' + data.tool;
+
+    if (data.tool) {
+      titleEl.hidden = true;
+
+      switch (data.tool) {
+        case 'LH':
+          const lhr = await fetch('/LH.json').then(resp => resp.json());
+          render.renderLighthouseResultsRow(data.resultsUrl, lhr, lhResultsRow);
+          break;
+        case 'PSI':
+          render.renderPSIResultsRow(data.resultsUrl, psiResultsRow);
+          break;
+        case 'WPT':
+          render.renderWPTResultsRow(data.resultsUrl, wptResultsRow);
+          break;
+        default:
+          break;
+      }
+    } else if (data.clear) {
+      render.renderLighthouseResultsRow(null, {}, lhResultsRow);
+      render.renderPSIResultsRow(null, psiResultsRow);
+      render.renderWPTResultsRow(null, wptResultsRow);
+    }
+
+    connection.send(JSON.stringify({msg}));
+  });
+
+  connection.addEventListener('close', e => {
+    // addMessage('Connection #' + connection.connectionId + ' closed, reason = ' +
+    //     e.reason + ', message = ' + e.msg);
+  });
+}
+
+async function init() {
+  if (!navigator.presentation.receiver) {
+    console.warn('This page was not opened by the Presentation API.');
+    return;
+  }
+
+  const list = await navigator.presentation.receiver.connectionList;
+  list.connections.map(connection => addConnection(connection));
+  list.addEventListener('connectionavailable', e => {
+    addConnection(e.connection);
+  });
+}
+
+init();
+
+})();
+</script>
+</body>
+</html>

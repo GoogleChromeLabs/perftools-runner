@@ -48,6 +48,7 @@ async function run(browser, url) {
     tool: 'LH',
     screenshot: await page.screenshot({fullPage: true}),
     html: await page.content(),
+    lhr: lhr.lhr,
   };
 
   await page.close();

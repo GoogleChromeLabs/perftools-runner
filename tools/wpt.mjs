@@ -96,9 +96,13 @@ async function run(browser, url) {
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
   await page.goto(`${resultsUrl}1/details/`);
 
+  const main = await page.$('#main');
+  const screenshot = await main.screenshot();
+  // const screenshot = await page.screenshot({fullPage: true});
+
   const obj = {
     tool: 'WPT',
-    screenshot: await page.screenshot({fullPage: true}),
+    screenshot,
     html: await page.content(),
     resultsUrl,
   };

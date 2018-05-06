@@ -497,6 +497,26 @@ body.report #report-link {
   animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
   animation-delay: 1.15s;
 }
+.cast-icon {
+  opacity: 0.4;
+  border: none;
+  position: absolute;
+  top: var(--padding);
+  right: var(--padding);
+  width: 24px;
+  height: 24px;
+  background: url("/img/ic_cast_white_24px.svg") no-repeat 50% 50%;
+  background-size: 100%;
+  cursor: pointer;
+  transition: opacity 200ms ease-in-out;
+  will-change: opacity;
+}
+.cast-icon:hover {
+  opacity: 1;
+}
+.cast-icon.on {
+  background-image: url("/img/ic_cast_connected_white_24px.svg");
+}
 footer {
   margin-top: calc(var(--padding) * 2);
 }

@@ -65,4 +65,106 @@ function renderToolReportLink(tool, container) {
   render(tmpl, container);
 }
 
-export {renderToolCards, renderToolRunCompleteIcons, renderToolReportLink};
+/**
+ * @param {!Array<!Object>} categories
+ */
+function renderGauges(categories) {
+  return html`${
+    repeat(categories, (cat) => cat.score, (cat, i) => { // eslint-disable-line
+      return html`<gauge-element score="${cat.score}">${cat.name}</gauge-element>`;
+    })
+  }`;
+}
+
+/**
+ * @param {string} resultsUrl
+ * @param {!Array<!Object>} categories
+ * @param {!HTMLElement} container
+ */
+function renderLighthouseResultsRow(resultsUrl, lhr, container) {
+  if (!resultsUrl || !resultsUrl.length) {
+    render(html``, container);
+    return;
+  }
+
+  const tool = runners['LH'];
+  // <!--<h1 id="url">${lhr.url}</h1>-->
+  const tmpl = html`
+    <div class="results-row layout center-center">
+      <div class="result-tool layout vertical center-center">
+        <img src="${tool.logo}" class="logo">
+        <h1>${tool.name}</h1>
+      </div>
+      <a href="${resultsUrl}" target="_results" class="layout">
+        ${renderGauges(lhr.reportCategories)}
+      </a>
+    </div>
+  `;
+
+  render(tmpl, container);
+}
+
+/**
+ * @param {string} resultsUrl
+ * @param {!HTMLElement} container
+ */
+function renderPSIResultsRow(resultsUrl, container) {
+  if (!resultsUrl || !resultsUrl.length) {
+    render(html``, container);
+    return;
+  }
+
+  const tool = runners['PSI'];
+  const tmpl = html`
+    <div class="results-row layout center-center">
+      <div class="result-tool layout vertical center-center">
+        <img src="${tool.logo}" class="logo">
+        <h1>${tool.name}</h1>
+      </div>
+      <div class="layout">
+        <a href="${resultsUrl}" target="_results" class="layout">
+          <img src="/PSI.png" class="screenshot">
+        </a>
+      </div>
+    </div>
+  `;
+
+  render(tmpl, container);
+}
+
+/**
+ * @param {string} resultsUrl
+ * @param {!HTMLElement} container
+ */
+function renderWPTResultsRow(resultsUrl, container) {
+  if (!resultsUrl || !resultsUrl.length) {
+    render(html``, container);
+    return;
+  }
+
+  const tool = runners['WPT'];
+  const tmpl = html`
+    <div class="results-row layout center-center">
+      <div class="result-tool layout vertical center-center">
+        <img src="${tool.logo}" class="logo">
+        <h1>${tool.name}</h1>
+      </div>
+      <div class="layout">
+        <a href="${resultsUrl}" target="_results" class="layout">
+          <img src="/WPT.png" class="screenshot wpt">
+        </a>
+      </div>
+    </div>
+  `;
+
+  render(tmpl, container);
+}
+
+export {
+  renderToolCards,
+  renderToolRunCompleteIcons,
+  renderToolReportLink,
+  renderLighthouseResultsRow,
+  renderPSIResultsRow,
+  renderWPTResultsRow,
+};

@@ -30,6 +30,7 @@ import * as LHTool from './tools/lighthouse.mjs';
 import * as TMSTool from './tools/tms.mjs';
 import * as WPTTool from './tools/wpt.mjs';
 import * as PSITool from './tools/psi.mjs';
+/* eslint-enable no-unused-vars */
 
 const CS_BUCKET = 'perf-sandbox.appspot.com';
 
@@ -322,6 +323,12 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
         console.info(`Finished running ${tool}.`);
 
         await util.promisify(fs.writeFile)(`./tmp/${tool}.html`, results.html);
+        if (results.lhr) {
+          await util.promisify(fs.writeFile)(`./tmp/${tool}.json`, JSON.stringify(results.lhr));
+        }
+
+        console.info('Saving screenshot...');
+        await util.promisify(fs.writeFile)(`./tmp/${tool}.png`, results.screenshot);
 
         const resultsUrl = results.resultsUrl || `/${tool}.html`;
 
@@ -332,12 +339,12 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
       });
     });
 
-    console.info('Taking screenshots...');
+    // console.info('Taking screenshots...');
     const results = await Promise.all(toolsToRun);
-    for (const {tool, screenshot} of results) {
-      await util.promisify(fs.writeFile)(`./tmp/${tool}.png`, screenshot);
-    }
-    console.info('Done.');
+    // for (const {tool, screenshot} of results) {
+    //   await util.promisify(fs.writeFile)(`./tmp/${tool}.png`, screenshot);
+    // }
+    // console.info('Done.');
 
     // Save HTML page of results and create PDF from it using Puppeteer.
     console.info('Creating PDF...');

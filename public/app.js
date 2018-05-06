@@ -2,6 +2,7 @@
 
 import * as render from './render.js';
 import {runners} from './tools.mjs';
+import {Presentation} from './presentation.js';
 
 // Render main HTML before anything else.
 const primaryTools = Object.entries(runners).filter(t => t[1].primary);
@@ -21,6 +22,9 @@ const shareAction = document.querySelector('#report-link .share-action');
 const overlay = document.querySelector('.overlay');
 const shareUrlInput = overlay.querySelector('input');
 const copyReportURL = overlay.querySelector('.copy-action img');
+const castIcon = document.querySelector('.cast-icon');
+
+const presenter = new Presentation('receiver.html');
 
 /**
  * Fades in the tool screenshots one by one.
@@ -98,6 +102,7 @@ function streamResults(url) {
           const check = document.querySelector(`.tool-check[data-tool="${msg.tool}"]`);
           check.classList.add('done');
           render.renderToolReportLink({name: tool.name, resultsUrl: msg.resultsUrl}, check);
+          presenter.send({tool: msg.tool, resultsUrl: msg.resultsUrl});
         }
         if (msg.completed) {
           clearInterval(interval);
@@ -153,6 +158,8 @@ async function go(url) {
   // Reset some UI elements.
   removeCompletedChecks(selectedTools);
   shareUrlInput.value = null;
+
+  presenter.send({clear: true}); // reset receiver UI.
 
   document.body.classList.add('running');
   arrow.classList.add('disabled');
@@ -233,7 +240,7 @@ shareAction.addEventListener('click', async e => {
   overlay.classList.add('show');
 });
 
-copyReportURL.addEventListener('click', e => {
+copyReportURL.addEventListener('click', () => {
   navigator.clipboard.writeText(shareUrlInput.value).then(() => {
     console.log('URL copied to clipboard.');
     shareUrlInput.select();
@@ -258,6 +265,45 @@ arrow.addEventListener('click', async e => {
   e.stopPropagation();
   await go(input.value);
 });
+
+/**
+ * Starts presenting.
+ */
+async function startCast() {
+  const id = localStorage.getItem('connectionId');
+  try {
+    const connection = await presenter.start(id); // eslint-disable-line
+  } catch (err) {
+    localStorage.removeItem('connectionId');
+    console.warn('Try starting the cast again.');
+    return;
+  }
+
+  presenter.presoRequest.addEventListener('connectionavailable', e => {
+    castIcon.classList.toggle('on');
+    localStorage.setItem('connectionId', e.connection.id);
+  }, {once: true});
+
+  presenter.onmessage = data => {
+    console.log('Received message', data.msg);
+  };
+}
+
+castIcon.addEventListener('click', e => {
+  e.preventDefault();
+  if (castIcon.classList.contains('on')) {
+    presenter.stop();
+    castIcon.classList.remove('on');
+    localStorage.removeItem('connectionId');
+  } else {
+    startCast();
+  }
+});
+
+// Attempt to start/reconnect to receiver app on page load. This will only
+// succeed if the user is refreshing the page and a cast session was previously
+started.
+castIcon.click();
 
 document.addEventListener('click', e => {
   if (overlay.classList.contains('show') && e.target === overlay) {
