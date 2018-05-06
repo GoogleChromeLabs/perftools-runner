@@ -20,8 +20,13 @@
       width: 160px;
       display: inline-flex;
     }
-    .title {
+    #title h1 {
       font-size: 5vw;
+      color: var(--material-blue-grey-800);
+    }
+    #title img {
+      height: 100px;
+      width: 100px;
     }
     .result-tool {
       font-size: 14px;
@@ -49,12 +54,46 @@
     .screenshot.wpt {
       object-position: 0 0;
     }
+    .waiting {
+      opacity: 0;
+      transition: opacity 300ms ease-in-out;
+      will-change: opacity;
+      font-size: 40px;
+      color: var(--material-blue-grey-400);
+    }
+    .waiting.show {
+      opacity: 1;
+    }
+    @keyframes bounce {
+      from {
+        transform: translateY(16px);
+      }
+      to {
+        transform: none;
+      }
+    }
+    .bounce {
+      animation-name: bounce;
+      animation-duration: 400ms;
+      animation-iteration-count: infinite;
+      animation-direction: alternate-reverse;
+      /* animation-delay: 4s; */
+    }
+    .hand {
+      font-size: 150px;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
 
 <main id="container" class="layout vertical center-center">
-  <h1 class="title">👇 Enter a URL to get started. 👇</h1>
+  <header id="title" class="layout vertical center-center">
+    <h1>Enter a URL to get started.</h1>
+    <!-- <img src="/img/ic_arrow_drop_down_circle_black_24px.svg" class="bounce"> -->
+    <div class="bounce hand">👇</div>
+  </header>
+  <h1 class="waiting">waiting for results...</h1>
 
   <!-- <h1 id="url">http://example.com</h1> -->
 
@@ -62,7 +101,7 @@
   <div id="psi-results"></div>
   <div id="wpt-results"></div>
 
-   <!--
+<!--
   <div class="results-row layout center-center">
     <div class="result-tool layout vertical center-center">
       <img src="/img/tool-lighthouse.svg" class="logo">
@@ -102,7 +141,9 @@
 (async () => {
 const render = await import('./render.js');
 
-const titleEl = document.querySelector('.title');
+const titleEl = document.querySelector('#title');
+const waitingEl = document.querySelector('.waiting');
+const handEl = document.querySelector('.hand');
 const lhResultsRow = document.querySelector('#lh-results');
 const psiResultsRow = document.querySelector('#psi-results');
 const wptResultsRow = document.querySelector('#wpt-results');
@@ -122,6 +163,7 @@ function addConnection(connection) {
 
     if (data.tool) {
       titleEl.hidden = true;
+      waitingEl.classList.remove('show');
 
       switch (data.tool) {
         case 'LH':
@@ -141,6 +183,8 @@ function addConnection(connection) {
       render.renderLighthouseResultsRow(null, {}, lhResultsRow);
       render.renderPSIResultsRow(null, psiResultsRow);
       render.renderWPTResultsRow(null, wptResultsRow);
+      titleEl.hidden = false;
+      waitingEl.classList.add('show');
     }
 
     connection.send(JSON.stringify({msg}));
