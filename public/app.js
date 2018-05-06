@@ -302,7 +302,6 @@ castIcon.addEventListener('click', e => {
 
 // Attempt to start/reconnect to receiver app on page load. This will only
 // succeed if the user is refreshing the page and a cast session was previously
-started.
 castIcon.click();
 
 document.addEventListener('click', e => {
