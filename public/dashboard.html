@@ -30,7 +30,7 @@
     }
     .run-tools {
       display: inline-block;
-      width: 100px;
+      width: 110px;
     }
     #runs {
       padding: 0 var(--padding);
@@ -97,7 +97,7 @@ function renderGauges(lhScores) {
         <li class="run">
           <a href="${doc.url}" class="run-link">${doc.url}</a>
           <span class="run-tools">( ${tools} )</span>
-          <span class="run-lh-scores">LH scores: ${lhScores}</span>
+          <span class="run-lh-scores">${lhScores}</span>
         </li>`;
     })
   }`;
