@@ -90,7 +90,7 @@ main {
   height: 100vh;
 }
 #tools .toprow {
-  margin: calc(var(--padding) * 3) 0;
+  margin: var(--padding) 0 calc(var(--padding) * 3) 0;
   flex-shrink: 0;
 }
 #tools .bottomrow {
@@ -524,7 +524,7 @@ body.report #report-link {
   background-image: url("/img/ic_cast_connected_white_24px.svg");
 }
 footer {
-  margin-top: calc(var(--padding) * 2);
+  margin-top: var(--padding);
 }
 footer a {
   color: var(--material-team-A400);
