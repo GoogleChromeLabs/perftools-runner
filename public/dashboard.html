@@ -11,7 +11,7 @@
   <style>
     body {
       padding: calc(var(--padding) * 4);
-      background-color: var(--material-blue-grey-50);
+      background-color: #fff;
       color: var(--material-blue-grey-900);
     }
     h1, h2 {
@@ -47,7 +47,7 @@
 
 <main>
   <h1>Tool runs:</h1>
-  <ol id="runs"></ol>
+  <ol id="runs" reversed></ol>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-app.js"></script>
@@ -91,8 +91,8 @@ function renderGauges(lhScores) {
   const tmpl = html`${
     repeat(docs, null, (doc, i) => { // eslint-disable-linehtml`
       const lhScores = doc.lhr ? Object.entries(doc.lhr).map(item => `${item[0]}: ${item[1]} `) : '';
-      const tools = Object.entries(doc.tools).filter(item => item[1]).map(item => item[0]).join(', ');
       // const lhScores = renderGauges(doc.lhr ? Object.entries(doc.lhr) : []);
+      const tools = Object.entries(doc.tools).filter(item => item[1]).map(item => item[0]).join(', ');
       return html`
         <li class="run">
           <a href="${doc.url}" class="run-link">${doc.url}</a>
@@ -105,21 +105,20 @@ function renderGauges(lhScores) {
   render(tmpl, container);
 }
 
-
 function queryRuns(tool = null) {
   const query = tool ? collection.where(`tools.${tool}`, '==', true) : collection;
-  return query;
+  return query.orderBy('createdAt', 'desc');
 }
 
-// Get entires with LH results.
-async function queryRunsWithLHResults() {
-  const docSnapshot = await collection.where('lhr.pwa', '>=', 0).get();
-  renderResults(docSnapshot.docs.map(doc => doc.data()), runsContainer);
-}
+// // Get entires with LH results.
+// async function queryRunsWithLHResults() {
+//   const querySnapshot = await collection.where('lhr.pwa', '>=', 0).get();
+//   renderResults(querySnapshot.docs.map(doc => doc.data()), runsContainer);
+// }
 
 function setupRealtimeUpdates() {
-  const observer = queryRuns().onSnapshot(docSnapshot => {
-    const docs = docSnapshot.docs.map(doc => doc.data());
+  const observer = queryRuns().onSnapshot(querySnapshot => {
+    const docs = querySnapshot.docs.map(doc => doc.data());
     renderResults(docs, runsContainer);
   }, err => {
     console.log(`Encountered error: ${err}`);
@@ -127,15 +126,6 @@ function setupRealtimeUpdates() {
 }
 
 setupRealtimeUpdates();
-
-// db.collection("cities").where("state", "==", "CA")
-//     .onSnapshot(function(querySnapshot) {
-//         var cities = [];
-//         querySnapshot.forEach(function(doc) {
-//             cities.push(doc.data().name);
-//         });
-//         console.log("Current cities in CA: ", cities.join(", "));
-//     });
 
 })();
 </script>

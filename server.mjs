@@ -253,6 +253,7 @@ function logToFirestore(url, tools, lhr) {
       PSI: tools.includes('PSI'),
       WPT: tools.includes('WPT'),
     },
+    createdAt: Date.now(),
   };
   if (lhr) {
     data.lhr = {};
