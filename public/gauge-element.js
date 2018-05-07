@@ -12,10 +12,10 @@ tmpl.innerHTML = `
     --pass-color: hsl(139, 70%, 30%);
     --informative-color: #0c50c7;
     --body-line-height: 1;
-  }
-  .lh-gauge__wrapper {
     --circle-size: 125px;
     --circle-size-half: calc(var(--circle-size) / 2);
+  }
+  .lh-gauge__wrapper {
     --circle-background: hsl(216, 12%, 92%);
     --circle-border-width: 9;
     --inset-size: calc(var(--circle-size) - 2 * var(--circle-border-width));
@@ -77,6 +77,10 @@ tmpl.innerHTML = `
     /* Contain the layout style paint & layers during animation*/
     contain: content;
     will-change: opacity; /* Only using for layer promotion */
+  }
+  :host(.small) .lh-gauge__label {
+    font-size: 12px;
+    margin: 0;
   }
   .lh-gauge__label {
     margin: 14px 0 0 0;

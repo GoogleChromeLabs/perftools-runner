@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Lighthouse &amp; Friends</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:400,500">
+  <meta name="author" content="Eric Bidelman">
+  <link rel="shortcut icon" href="https://developers.google.com/_static/images/favicon.png">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      padding: calc(var(--padding) * 4);
+      background-color: var(--material-blue-grey-50);
+      color: var(--material-blue-grey-900);
+    }
+    h1, h2 {
+      font-weight: 300;
+    }
+    .run .run-lh-scores {
+      margin-left: var(--padding);
+    }
+    .run-link {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 250px;
+      display: inline-block;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .run-tools {
+      display: inline-block;
+      width: 100px;
+    }
+    #runs {
+      padding: 0 var(--padding);
+    }
+    gauge-element {
+      --circle-size: 50px;
+      width: 100px;
+      display: inline-flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<main>
+  <h1>Tool runs:</h1>
+  <ol id="runs"></ol>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-firestore.js"></script>
+<!-- <script src="gauge-element.js" type="module"></script> -->
+<script type="module">
+import {html, render} from '../lit-html/lit-html.js';
+import {repeat} from '../lit-html/lib/repeat.js';
+
+(async() => {
+
+const runsContainer = document.querySelector('#runs');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyB40db_e2H6wlB28PBeaS04JlVuL3OY-1U",
+  authDomain: "perf-sandbox.firebaseapp.com",
+  databaseURL: "https://perf-sandbox.firebaseio.com",
+  projectId: "perf-sandbox",
+  storageBucket: "perf-sandbox.appspot.com",
+  messagingSenderId: "394569698898"
+});
+
+const db = firebase.firestore();
+db.settings({timestampsInSnapshots: true});
+
+const collection = db.collection('runs');
+
+function renderGauges(lhScores) {
+  return html`${
+    repeat(lhScores, null, (cat, i) => { // eslint-disable-line
+      return html`<gauge-element score="${cat[1]}" class="small">${cat[0]}</gauge-element>`;
+    })
+  }`;
+}
+
+/**
+ * @param {!Array} results
+ * @param {!HTMLElement} container
+ */
+ function renderResults(docs, container) {
+  const tmpl = html`${
+    repeat(docs, null, (doc, i) => { // eslint-disable-linehtml`
+      const lhScores = doc.lhr ? Object.entries(doc.lhr).map(item => `${item[0]}: ${item[1]} `) : '';
+      const tools = Object.entries(doc.tools).filter(item => item[1]).map(item => item[0]).join(', ');
+      // const lhScores = renderGauges(doc.lhr ? Object.entries(doc.lhr) : []);
+      return html`
+        <li class="run">
+          <a href="${doc.url}" class="run-link">${doc.url}</a>
+          <span class="run-tools">( ${tools} )</span>
+          <span class="run-lh-scores">LH scores: ${lhScores}</span>
+        </li>`;
+    })
+  }`;
+
+  render(tmpl, container);
+}
+
+
+function queryRuns(tool = null) {
+  const query = tool ? collection.where(`tools.${tool}`, '==', true) : collection;
+  return query;
+}
+
+// Get entires with LH results.
+async function queryRunsWithLHResults() {
+  const docSnapshot = await collection.where('lhr.pwa', '>=', 0).get();
+  renderResults(docSnapshot.docs.map(doc => doc.data()), runsContainer);
+}
+
+function setupRealtimeUpdates() {
+  const observer = queryRuns().onSnapshot(docSnapshot => {
+    const docs = docSnapshot.docs.map(doc => doc.data());
+    renderResults(docs, runsContainer);
+  }, err => {
+    console.log(`Encountered error: ${err}`);
+  });
+}
+
+setupRealtimeUpdates();
+
+// db.collection("cities").where("state", "==", "CA")
+//     .onSnapshot(function(querySnapshot) {
+//         var cities = [];
+//         querySnapshot.forEach(function(doc) {
+//             cities.push(doc.data().name);
+//         });
+//         console.log("Current cities in CA: ", cities.join(", "));
+//     });
+
+})();
+</script>
+</body>
+</html>

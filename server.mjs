@@ -34,11 +34,14 @@ import * as PSITool from './tools/psi.mjs';
 
 const CS_BUCKET = 'perf-sandbox.appspot.com';
 
-firebaseAdmin.initializeApp({
+const firebaseApp = firebaseAdmin.initializeApp({
+  // credential: firebaseAdmin.credential.applicationDefault(),
   credential: firebaseAdmin.credential.cert(
     JSON.parse(fs.readFileSync('./serviceAccount.json'))),
   storageBucket: CS_BUCKET,
 });
+const db = firebaseApp.firestore();
+
 
 const app = express();
 
@@ -235,6 +238,32 @@ async function uploadPDF(pdfURL) {
   return null;
 }
 
+/**
+ *
+ * @param {string} url
+ * @param {!Array<string>} tools
+ * @param {!Arrray<!Object>} lhr
+ * @return {DocumentRef}
+ */
+function logToFirestore(url, tools, lhr) {
+  const data = {
+    url,
+    tools: {
+      LH: tools.includes('LH'),
+      PSI: tools.includes('PSI'),
+      WPT: tools.includes('WPT'),
+    },
+  };
+  if (lhr) {
+    data.lhr = {};
+    lhr.reportCategories.forEach(cat => {
+      data.lhr[cat.id] = cat.score;
+    });
+  }
+
+  return db.collection('runs').doc().set(data);
+}
+
 // app.use(function forceSSL(req, res, next) {
 //   const fromCron = req.get('X-Appengine-Cron');
 //   if (!fromCron && req.hostname !== 'localhost' && req.get('X-Forwarded-Proto') === 'http') {
@@ -299,13 +328,6 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
     throw err;
   }
 
-  // Log url to file.
-  try {
-    util.promisify(fs.writeFile)('runs.txt', `${url},${tools}\n`, {flag: 'a'}); // async
-  } catch (err) {
-    console.warn(err);
-  }
-
   const browser = await puppeteer.launch({
     headless,
     // dumpio: true,
@@ -315,6 +337,7 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
   // If on Mac, use DPR=2 so screenshots are gorgeous.
   DEFAULT_SCREENSHOT_VIEWPORT.deviceScaleFactor = process.platform === 'darwin' ? 2 : 1;
 
+  let lhr = null;
   try {
     const toolsToRun = tools.map(tool => {
       console.info(`Started running ${tool}...`);
@@ -324,6 +347,7 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
 
         await util.promisify(fs.writeFile)(`./tmp/${tool}.html`, results.html);
         if (results.lhr) {
+          lhr = results.lhr;
           await util.promisify(fs.writeFile)(`./tmp/${tool}.json`, JSON.stringify(results.lhr));
         }
 
@@ -339,18 +363,27 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
       });
     });
 
-    // console.info('Taking screenshots...');
     const results = await Promise.all(toolsToRun);
-    // for (const {tool, screenshot} of results) {
-    //   await util.promisify(fs.writeFile)(`./tmp/${tool}.png`, screenshot);
-    // }
-    // console.info('Done.');
 
     // Save HTML page of results and create PDF from it using Puppeteer.
     console.info('Creating PDF...');
     await util.promisify(fs.writeFile)('./tmp/results.html', createHTML(results));
     const pdf = await createPDF(origin, browser, 'results.html');
     console.info('Done.');
+
+    // Log url to file.
+    try {
+      util.promisify(fs.writeFile)('runs.txt', `${url},${tools}\n`, {flag: 'a'}); // async
+    } catch (err) {
+      console.warn(err);
+    }
+
+    // Log run to firestore.
+    try {
+      logToFirestore(url, tools, lhr);
+    } catch (err) {
+      console.warn(err);
+    }
 
     res.write(`data: "${JSON.stringify({
       completed: true,
