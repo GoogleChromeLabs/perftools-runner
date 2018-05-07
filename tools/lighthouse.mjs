@@ -43,6 +43,7 @@ async function run(browser, url) {
   const page = await browser.newPage();
   await page.setViewport(tools.DEFAULT_SCREENSHOT_VIEWPORT);
   await page.setContent(lhr.report);
+  await page.waitFor(1100); // wait for 1s+ so report score gauges have finished their animation.
 
   const obj = {
     tool: 'LH',
