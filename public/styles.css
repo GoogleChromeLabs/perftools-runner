@@ -41,6 +41,9 @@ body {
   background-color: var(--material-blue-grey-900);
   overflow: hidden;
 }
+[hidden] {
+  display: none !important;
+}
 a {
   color: var(--material-blue-grey-dark);
   text-decoration: none;
@@ -87,7 +90,7 @@ main {
   height: 100vh;
 }
 #tools .toprow {
-  margin: calc(var(--padding) * 2) 0;
+  margin: calc(var(--padding) * 3) 0;
   flex-shrink: 0;
 }
 #tools .bottomrow {

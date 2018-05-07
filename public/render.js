@@ -93,7 +93,7 @@ function renderLighthouseResultsRow(resultsUrl, lhr, container) {
     <div class="results-row layout center-center">
       <div class="result-tool layout vertical center-center">
         <img src="${tool.logo}" class="logo">
-        <h1>${tool.name}</h1>
+        <h1>${tool.name} results</h1>
       </div>
       <a href="${resultsUrl}" target="_results" class="layout">
         ${renderGauges(lhr.reportCategories)}
@@ -119,11 +119,11 @@ function renderPSIResultsRow(resultsUrl, container) {
     <div class="results-row layout center-center">
       <div class="result-tool layout vertical center-center">
         <img src="${tool.logo}" class="logo">
-        <h1>${tool.name}</h1>
+        <h1>${tool.name} results</h1>
       </div>
       <div class="layout">
         <a href="${resultsUrl}" target="_results" class="layout">
-          <img src="/PSI.png" class="screenshot">
+          <img src="/PSI.png" class="screenshot psi">
         </a>
       </div>
     </div>
@@ -147,7 +147,7 @@ function renderWPTResultsRow(resultsUrl, container) {
     <div class="results-row layout center-center">
       <div class="result-tool layout vertical center-center">
         <img src="${tool.logo}" class="logo">
-        <h1>${tool.name}</h1>
+        <h1>${tool.name} results</h1>
       </div>
       <div class="layout">
         <a href="${resultsUrl}" target="_results" class="layout">

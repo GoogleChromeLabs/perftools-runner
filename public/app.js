@@ -94,6 +94,8 @@ function streamResults(url) {
       });
     }, 1000);
 
+    presenter.send({status: 'started'});
+
     source.addEventListener('message', e => {
       try {
         const msg = JSON.parse(e.data.replace(/"(.*)"/, '$1'));
@@ -108,6 +110,7 @@ function streamResults(url) {
           clearInterval(interval);
           checks.forEach(check => check.classList.add('done'));
           source.close();
+          presenter.send({status: 'complete'});
           resolve(msg);
         }
         if (msg.errors) {
@@ -159,7 +162,7 @@ async function go(url) {
   removeCompletedChecks(selectedTools);
   shareUrlInput.value = null;
 
-  presenter.send({clear: true}); // reset receiver UI.
+  presenter.send({status: 'reset'});// reset receiver UI.
 
   document.body.classList.add('running');
   arrow.classList.add('disabled');

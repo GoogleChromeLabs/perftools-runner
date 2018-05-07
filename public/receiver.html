@@ -58,10 +58,17 @@
       opacity: 0;
       transition: opacity 300ms ease-in-out;
       will-change: opacity;
-      font-size: 40px;
+      font-size: 50px;
       color: var(--material-blue-grey-400);
     }
-    .waiting.show {
+    .running #title,
+    .complete #title {
+      display: none;
+    }
+    .results .waiting {
+      display: none;
+    }
+    .running .waiting {
       opacity: 1;
     }
     @keyframes bounce {
@@ -141,15 +148,39 @@
 (async () => {
 const render = await import('./render.js');
 
+const container = document.querySelector('#container');
 const titleEl = document.querySelector('#title');
-const waitingEl = document.querySelector('.waiting');
-const handEl = document.querySelector('.hand');
 const lhResultsRow = document.querySelector('#lh-results');
 const psiResultsRow = document.querySelector('#psi-results');
 const wptResultsRow = document.querySelector('#wpt-results');
 
 let connectionIdx = 0;
 let messageIdx = 0;
+let resetUIInterval = null;
+
+function setFirstLoadUI() {
+  resetUI();
+  titleEl.hidden = false;
+}
+
+function resetUI() {
+  clearTimeout(resetUIInterval);
+  container.classList.remove('running', 'complete', 'results');
+  render.renderLighthouseResultsRow(null, {}, lhResultsRow);
+  render.renderPSIResultsRow(null, psiResultsRow);
+  render.renderWPTResultsRow(null, wptResultsRow);
+}
+
+function setStartedUI() {
+  container.classList.add('running');
+}
+
+function setCompleteUI() {
+  container.classList.remove('running');
+  container.classList.add('complete');
+  titleEl.hidden = true;
+  resetUIInterval = setTimeout(setFirstLoadUI, 60 * 1000); // reset UI after 60s
+}
 
 function addConnection(connection) {
   connection.connectionId = ++connectionIdx;
@@ -161,9 +192,22 @@ function addConnection(connection) {
     const msg = 'Message ' + messageIdx + ' from connection #' +
         connection.connectionId + ': ' + data.tool;
 
+    switch (data.status) {
+      case 'reset':
+        resetUI();
+        break;
+      case 'started':
+        setStartedUI();
+        break;
+      case 'complete':
+        setCompleteUI();
+        break;
+      default:
+        break;
+    }
+
     if (data.tool) {
-      titleEl.hidden = true;
-      waitingEl.classList.remove('show');
+      container.classList.add('results');
 
       switch (data.tool) {
         case 'LH':
@@ -179,12 +223,6 @@ function addConnection(connection) {
         default:
           break;
       }
-    } else if (data.clear) {
-      render.renderLighthouseResultsRow(null, {}, lhResultsRow);
-      render.renderPSIResultsRow(null, psiResultsRow);
-      render.renderWPTResultsRow(null, wptResultsRow);
-      titleEl.hidden = false;
-      waitingEl.classList.add('show');
     }
 
     connection.send(JSON.stringify({msg}));
