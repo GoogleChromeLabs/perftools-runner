@@ -257,7 +257,7 @@ function logToFirestore(url, tools, lhr) {
   };
   if (lhr) {
     data.lhr = {};
-    lhr.reportCategories.forEach(cat => {
+    Object.value(lhr.categories).forEach(cat => {
       data.lhr[cat.id] = cat.score;
     });
   }

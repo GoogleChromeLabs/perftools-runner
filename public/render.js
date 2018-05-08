@@ -70,7 +70,7 @@ function renderToolReportLink(tool, container) {
  */
 function renderGauges(categories) {
   return html`${
-    repeat(categories, (cat) => cat.score, (cat, i) => { // eslint-disable-line
+    repeat(categories, null, (cat, i) => { // eslint-disable-line
       return html`<gauge-element score="${cat.score}">${cat.name}</gauge-element>`;
     })
   }`;
@@ -96,7 +96,7 @@ function renderLighthouseResultsRow(resultsUrl, lhr, container) {
         <h1>${tool.name} results</h1>
       </div>
       <a href="${resultsUrl}" target="_results" class="layout">
-        ${renderGauges(lhr.reportCategories)}
+        ${renderGauges(Object.values(lhr.categories))}
       </a>
     </div>
   `;

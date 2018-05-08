@@ -2230,7 +2230,7 @@ lighthouse-logger@^1.0.0:
 
 lighthouse@GoogleChrome/lighthouse:
   version "3.0.0-alpha"
-  resolved "https://codeload.github.com/GoogleChrome/lighthouse/tar.gz/be717094368bf48b9d6b3e8566158d888b76409c"
+  resolved "https://codeload.github.com/GoogleChrome/lighthouse/tar.gz/beb709294e588317d9fb0a62cfd9cb3a6672d60c"
   dependencies:
     axe-core "3.0.0-beta.2"
     chrome-devtools-frontend "1.0.422034"
