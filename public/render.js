@@ -123,7 +123,7 @@ function renderPSIResultsRow(resultsUrl, container) {
       </div>
       <div class="layout">
         <a href="${resultsUrl}" target="_results" class="layout">
-          <img src="/PSI.png" class="screenshot psi">
+          <img src="/PSI.png?${Math.random()}" class="screenshot psi">
         </a>
       </div>
     </div>
@@ -151,7 +151,7 @@ function renderWPTResultsRow(resultsUrl, container) {
       </div>
       <div class="layout">
         <a href="${resultsUrl}" target="_results" class="layout">
-          <img src="/WPT.png" class="screenshot wpt">
+          <img src="/WPT.png?${Math.random()}" class="screenshot wpt">
         </a>
       </div>
     </div>
