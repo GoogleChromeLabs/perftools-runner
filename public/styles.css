@@ -142,8 +142,7 @@ main {
 .tool-container[data-primary="false"] .external-link-icon {
   display: initial;
 }
-.tool-container:focus {
-  /* outline: 3px solid var(--material-blue-grey-800); */
+:focus:not(.focus-visible) {
   outline: none;
 }
 /* .tool-container:hover::after {
