@@ -13,6 +13,7 @@
       padding: calc(var(--padding) * 4);
       background-color: #fff;
       color: var(--material-blue-grey-900);
+      overflow: auto;
     }
     h1, h2 {
       font-weight: 300;
@@ -35,14 +36,33 @@
     #runs {
       padding: 0 var(--padding);
     }
-    /* gauge-element {
-      width: 100px;
-      display: inline-flex;
-      justify-content: center;
-    } */
     #avg-lighthouse-scores {
       justify-content: space-evenly;
       padding: var(--padding) 0;
+    }
+    @media (max-width: 450px) {
+      body {
+        padding: calc(var(--padding) / 2);
+      }
+      h1 {
+        font-size: 5vw;
+      }
+      gauge-element {
+        --circle-size: 40px;
+        width: 150px;
+        display: inline-flex;
+        justify-content: center;
+      }
+      #avg-lighthouse-scores {
+        flex-wrap: wrap;
+        justify-content: start;
+      }
+      .run-lh-scores {
+        display: none;
+      }
+      .run-link {
+        width: 60%;
+      }
     }
   </style>
 </head>
