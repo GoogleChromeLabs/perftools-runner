@@ -331,6 +331,7 @@ app.get('/run', catchAsyncErrors(async (req, res) => {
 
   const browser = await puppeteer.launch({
     headless,
+    executablePath: '/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary',
     // dumpio: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
