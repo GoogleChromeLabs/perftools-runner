@@ -141,14 +141,17 @@ class GaugeElement extends HTMLElement {
   }
 
   update() {
-    const score = Math.round(this.score * 100);
-    this.gaugeEl.textContent = score;
-    this.wrapper.className = 'lh-gauge__wrapper';
-    // 329 is ~= 2 * Math.PI * gauge radius (53)
-    // https://codepen.io/xgad/post/svg-radial-progress-meters
-    const arc = this.shadowRoot.querySelector('.lh-gauge-arc');
-    arc.style.strokeDasharray = `${this.score * 329} 329`;
-    this.wrapper.classList.add(`lh-gauge__wrapper--${Util.calculateRating(this.score)}`);
+    // Wait a raf so lit-html rendering has time to setup attributes on custom element.
+    requestAnimationFrame(() => {
+      const score = Math.round(this.score * 100);
+      this.gaugeEl.textContent = score;
+      this.wrapper.className = 'lh-gauge__wrapper';
+      // 329 is ~= 2 * Math.PI * gauge radius (53)
+      // https://codepen.io/xgad/post/svg-radial-progress-meters
+      const arc = this.shadowRoot.querySelector('.lh-gauge-arc');
+      arc.style.strokeDasharray = `${this.score * 329} 329`;
+      this.wrapper.classList.add(`lh-gauge__wrapper--${Util.calculateRating(this.score)}`);
+    });
   }
 }
 /* eslint-enable  require-jsdoc */

@@ -74,7 +74,7 @@
     <div id="avg-lighthouse-scores" class="layout"></div>
   </div>
   <div>
-    <h1>Runs:</h1>
+    <h1>Runs (<span id="numruns"></span>):</h1>
     <ol id="runs" reversed></ol>
   </div>
 </main>
@@ -89,6 +89,7 @@ import {repeat} from '../lit-html/lib/repeat.js';
 (async() => {
 
 const runsContainer = document.querySelector('#runs');
+const numRuns = document.querySelector('#numruns');
 
 firebase.initializeApp({
   apiKey: "AIzaSyB40db_e2H6wlB28PBeaS04JlVuL3OY-1U",
@@ -106,7 +107,7 @@ const collection = db.collection('runs');
 
 function renderGauges(lhScores, container) {
   const tmpl = html`${
-    repeat(lhScores, null, (cat, i) => { // eslint-disable-line
+    repeat(lhScores, cat => cat[1], (cat, i) => { // eslint-disable-line
       return html`<gauge-element score="${cat[1]}">${cat[0]}</gauge-element>`;
     })
   }`;
@@ -134,6 +135,21 @@ function renderGauges(lhScores, container) {
   render(tmpl, container);
 }
 
+ function renderRunInfo(docs, container) {
+  const numLHRuns = docs.filter(doc => doc.tools.LH).length;
+  const numPSIRuns = docs.filter(doc => doc.tools.PSI).length;
+  const numWPTRuns = docs.filter(doc => doc.tools.WPT).length;
+
+  const tmpl = html`
+    <label>Total</label>:<span>${docs.length}</span>,
+    <label>LH</label>:<span>${numLHRuns}</span>,
+    <label>PSI</label>:<span>${numPSIRuns}</span>,
+    <label>WPT</label>:<span>${numWPTRuns}</span>
+  `;
+
+  render(tmpl, container);
+ }
+
 function queryRuns(tool = null) {
   const query = tool ? collection.where(`tools.${tool}`, '==', true) : collection;
   return query.orderBy('createdAt', 'desc');
@@ -149,6 +165,7 @@ async function queryRunsWithLHResults() {
   let a11yScoreSum = 0;
   let seoScoreSum = 0;
   let bestPracticesScoreSum = 0;
+
   const avgPwaScore = results.map(item => {
     pwaScoreSum += item.lhr.pwa;
     perfScoreSum += item.lhr.performance;
@@ -168,12 +185,12 @@ async function queryRunsWithLHResults() {
   renderGauges(Object.entries(avgScores), document.querySelector('#avg-lighthouse-scores'));
 }
 
-queryRunsWithLHResults();
-
 function setupRealtimeUpdates() {
   const observer = queryRuns().onSnapshot(querySnapshot => {
     const docs = querySnapshot.docs.map(doc => doc.data());
     renderResults(docs, runsContainer);
+    queryRunsWithLHResults(); // async
+    renderRunInfo(docs, numRuns);
   }, err => {
     console.log(`Encountered error: ${err}`);
   });
