@@ -35,24 +35,33 @@
     #runs {
       padding: 0 var(--padding);
     }
-    gauge-element {
-      --circle-size: 50px;
+    /* gauge-element {
       width: 100px;
       display: inline-flex;
       justify-content: center;
+    } */
+    #avg-lighthouse-scores {
+      justify-content: space-evenly;
+      padding: var(--padding) 0;
     }
   </style>
 </head>
 <body>
 
 <main>
-  <h1>Tool runs:</h1>
-  <ol id="runs" reversed></ol>
+  <div>
+    <h1>Average Lighthouse scores:</h1>
+    <div id="avg-lighthouse-scores" class="layout"></div>
+  </div>
+  <div>
+    <h1>Runs:</h1>
+    <ol id="runs" reversed></ol>
+  </div>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase-firestore.js"></script>
-<!-- <script src="gauge-element.js" type="module"></script> -->
+<script src="gauge-element.js" type="module"></script>
 <script type="module">
 import {html, render} from '../lit-html/lit-html.js';
 import {repeat} from '../lit-html/lib/repeat.js';
@@ -75,12 +84,13 @@ db.settings({timestampsInSnapshots: true});
 
 const collection = db.collection('runs');
 
-function renderGauges(lhScores) {
-  return html`${
+function renderGauges(lhScores, container) {
+  const tmpl = html`${
     repeat(lhScores, null, (cat, i) => { // eslint-disable-line
-      return html`<gauge-element score="${cat[1]}" class="small">${cat[0]}</gauge-element>`;
+      return html`<gauge-element score="${cat[1]}">${cat[0]}</gauge-element>`;
     })
   }`;
+  render(tmpl, container);
 }
 
 /**
@@ -91,7 +101,6 @@ function renderGauges(lhScores) {
   const tmpl = html`${
     repeat(docs, null, (doc, i) => { // eslint-disable-linehtml`
       const lhScores = doc.lhr ? Object.entries(doc.lhr).map(item => `${item[0]}: ${item[1]} `) : '';
-      // const lhScores = renderGauges(doc.lhr ? Object.entries(doc.lhr) : []);
       const tools = Object.entries(doc.tools).filter(item => item[1]).map(item => item[0]).join(', ');
       return html`
         <li class="run">
@@ -111,10 +120,35 @@ function queryRuns(tool = null) {
 }
 
 // // Get entires with LH results.
-// async function queryRunsWithLHResults() {
-//   const querySnapshot = await collection.where('lhr.pwa', '>=', 0).get();
-//   renderResults(querySnapshot.docs.map(doc => doc.data()), runsContainer);
-// }
+async function queryRunsWithLHResults() {
+  const querySnapshot = await collection.where('lhr.pwa', '>=', 0).get();
+  const results = querySnapshot.docs.map(doc => doc.data());
+
+  let pwaScoreSum = 0;
+  let perfScoreSum = 0;
+  let a11yScoreSum = 0;
+  let seoScoreSum = 0;
+  let bestPracticesScoreSum = 0;
+  const avgPwaScore = results.map(item => {
+    pwaScoreSum += item.lhr.pwa;
+    perfScoreSum += item.lhr.performance;
+    a11yScoreSum += item.lhr.accessibility;
+    seoScoreSum += item.lhr.seo;
+    bestPracticesScoreSum += item.lhr['best-practices'];
+  });
+
+  const avgScores = {
+    pwa: pwaScoreSum / querySnapshot.size,
+    performance: perfScoreSum / querySnapshot.size,
+    accessibility: a11yScoreSum / querySnapshot.size,
+    seo: seoScoreSum / querySnapshot.size,
+    ['best-practices']: bestPracticesScoreSum / querySnapshot.size,
+  };
+
+  renderGauges(Object.entries(avgScores), document.querySelector('#avg-lighthouse-scores'));
+}
+
+queryRunsWithLHResults();
 
 function setupRealtimeUpdates() {
   const observer = queryRuns().onSnapshot(querySnapshot => {
