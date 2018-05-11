@@ -155,11 +155,11 @@ function queryRuns(tool = null) {
   return query.orderBy('createdAt', 'desc');
 }
 
-// // Get entires with LH results.
+// Get entires with LH results.
 async function queryRunsWithLHResults() {
-  const querySnapshot = await collection.where('lhr.pwa', '>=', 0).get();
-  const results = querySnapshot.docs.map(doc => doc.data());
-
+  const querySnapshot = await collection.where('lhr.accessibility', '>=', 0).get();
+  // Unique urls.
+  const results = unique(querySnapshot.docs.map(doc => doc.data()), 'url');
   let pwaScoreSum = 0;
   let perfScoreSum = 0;
   let a11yScoreSum = 0;
@@ -183,6 +183,10 @@ async function queryRunsWithLHResults() {
   };
 
   renderGauges(Object.entries(avgScores), document.querySelector('#avg-lighthouse-scores'));
+}
+
+function unique(array, propertyName) {
+  return array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i);
 }
 
 function setupRealtimeUpdates() {
