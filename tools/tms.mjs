@@ -55,7 +55,9 @@ async function run(browser, url) {
 
   // await page.goto(TOOL.url);
   // await page.waitForSelector(TOOL.urlInputSelector);
-  await page.goto(`${TOOL.url}?url=${url}`);//, {waitUntil: 'networkidle2'});
+
+  // , {waitUntil: 'networkidle2'});
+  await page.goto(`${TOOL.url}?url=${url}`);
 
   // const inputHandle = await page.$(TOOL.urlInputSelector);
   // await inputHandle.type(url);
