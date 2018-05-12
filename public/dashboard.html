@@ -36,7 +36,8 @@
     #runs {
       padding: 0 var(--padding);
     }
-    #avg-lighthouse-scores {
+    #avg-lighthouse-scores,
+    #median-lighthouse-scores {
       justify-content: space-evenly;
       padding: var(--padding) 0;
     }
@@ -53,7 +54,8 @@
         display: inline-flex;
         justify-content: center;
       }
-      #avg-lighthouse-scores {
+      #avg-lighthouse-scores,
+      #median-lighthouse-scores {
         flex-wrap: wrap;
         justify-content: start;
       }
@@ -69,6 +71,10 @@
 <body>
 
 <main>
+  <div>
+    <h1>Median Lighthouse scores:</h1>
+    <div id="median-lighthouse-scores" class="layout"></div>
+  </div>
   <div>
     <h1>Average Lighthouse scores:</h1>
     <div id="avg-lighthouse-scores" class="layout"></div>
@@ -183,10 +189,41 @@ async function queryRunsWithLHResults() {
   };
 
   renderGauges(Object.entries(avgScores), document.querySelector('#avg-lighthouse-scores'));
+
+  const medianScores = {
+    pwa: median(results.map(item => item.lhr.pwa)),
+    performance: median(results.map(item => item.lhr.performance)),
+    accessibility: median(results.map(item => item.lhr.accessibility)),
+    seo: median(results.map(item => item.lhr.seo)),
+    ['best-practices']: median(results.map(item => item.lhr['best-practices'])),
+  };
+
+  renderGauges(Object.entries(medianScores), document.querySelector('#median-lighthouse-scores'));
 }
 
 function unique(array, propertyName) {
   return array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i);
+}
+
+/**
+ * The "median" is the "middle" value in the list of numbers.
+ * @param {Array} numbers An array of numbers.
+ * @return {Number} The calculated median value from the specified numbers.
+ */
+function median(numbers) {
+  // median of [3, 5, 4, 4, 1, 1, 2, 3] = 3
+  let median = 0
+  numbers.sort();
+
+  if (numbers.length % 2 === 0) {  // is even
+    // average of two middle numbers
+    median = (numbers[numbers.length / 2 - 1] + numbers[numbers.length / 2]) / 2;
+  } else { // is odd
+    // middle number only
+    median = numbers[(numbers.length - 1) / 2];
+  }
+
+  return median;
 }
 
 function setupRealtimeUpdates() {
