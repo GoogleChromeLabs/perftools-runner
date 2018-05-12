@@ -35,20 +35,20 @@ export const getResultsLink = (url) => (`
  * @param {string} screenshot Screenshot and result of the test.
  * @return {string} A html template with meta-data.
  */
-export function createHTMLTemplate({name, desc, url}, resultsLink, screenshot){
-    return (
-        `<h3 class="title">${name} results</h3>
-            <div>
-                <div class="desc">
-                About this tool: ${desc}
-                Learn more at <a href="${url}" target="_blank">${url}</a>
-            </div>
-            ${resultsLink}
-            </div>
-            <div class="screenshot">
-                <img src="data:img/png;base64,${screenshot.toString('base64')}">
-            </div>`
-    );
+export function createHTMLTemplate({name, desc, url}, resultsLink, screenshot) {
+  return (
+    `<h3 class="title">${name} results</h3>
+        <div>
+            <div class="desc">
+            About this tool: ${desc}
+            Learn more at <a href="${url}" target="_blank">${url}</a>
+        </div>
+        ${resultsLink}
+        </div>
+        <div class="screenshot">
+            <img src="data:img/png;base64,${screenshot.toString('base64')}">
+    </div>`
+  );
 }
 
 /**
@@ -57,8 +57,8 @@ export function createHTMLTemplate({name, desc, url}, resultsLink, screenshot){
  * @return {string} Created html page.
  */
 export function createHTMLPage(content) {
-  return(
-      `<html>
+  return (
+    `<html>
         <head>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:300,400">
             <style>
@@ -141,5 +141,5 @@ export function createHTMLPage(content) {
             ${content}
         </body>
     </html>`
-);
+  );
 }
