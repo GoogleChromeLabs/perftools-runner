@@ -20,11 +20,13 @@
  * @param {string} url URL to the result.
  * @return {string} A link to the results.
 */
-export const getResultsLink = (url) => (`
-      <p class="reportlink">
+export function getResultsLink(url) {
+  return (
+    `<p class="reportlink">
         Results available at: <a href="${url}" target="_blank">${url}</a>
-      </p>`
-);
+    </p>`
+  );
+}
 
 /**
  * Creates a html template with meta-data.
