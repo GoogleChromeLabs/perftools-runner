@@ -32,7 +32,7 @@ import * as WPTTool from './tools/wpt.mjs';
 import * as PSITool from './tools/psi.mjs';
 /* eslint-enable no-unused-vars */
 
-import {getResultsLink, createHTMLTemplate, createHTMLPage} from './html';
+import {getResultsLink, createHTMLTemplate, createHTMLPage} from './html.mjs';
 
 const CS_BUCKET = 'perf-sandbox.appspot.com';
 
