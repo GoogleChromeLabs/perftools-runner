@@ -30,9 +30,7 @@ export function getResultsLink(url) {
 
 /**
  * Creates a html template with meta-data.
- * @param {string} name Name of the  test.
- * @param {string} desc Description of the test.
- * @param {string} url Link to the tool.
+ * @param {Object} object with Name, Description and url.
  * @param {string} resultsLink Link to the result.
  * @param {string} screenshot Screenshot and result of the test.
  * @return {string} A html template with meta-data.
@@ -40,15 +38,15 @@ export function getResultsLink(url) {
 export function createHTMLTemplate({name, desc, url}, resultsLink, screenshot) {
   return (
     `<h3 class="title">${name} results</h3>
-        <div>
-            <div class="desc">
-            About this tool: ${desc}
-            Learn more at <a href="${url}" target="_blank">${url}</a>
+     <div>
+        <div class="desc">
+          About this tool: ${desc}
+          Learn more at <a href="${url}" target="_blank">${url}</a>
         </div>
         ${resultsLink}
-        </div>
-        <div class="screenshot">
-            <img src="data:img/png;base64,${screenshot.toString('base64')}">
+    </div>
+    <div class="screenshot">
+      <img src="data:img/png;base64,${screenshot.toString('base64')}">
     </div>`
   );
 }
@@ -64,14 +62,14 @@ export function createHTMLPage(content) {
         <head>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:300,400">
             <style>
-            :root {
+              :root {
                 --orange: rgb(255, 108, 0);
                 --purple: #4768FD;
                 --yellow: #FCD230;
                 --green: #31E7B6;
                 --padding: 16px;
-            }
-            body {
+              }
+              body {
                 /*background: url(https://storage.googleapis.com/io-2018.appspot.com/v1/hashtag.gif) no-repeat 100% 100%;
                 background-size: 25%;*/
                 font-family: 'Google Sans', 'Product Sans', sans-serif;
@@ -79,62 +77,62 @@ export function createHTMLPage(content) {
                 color: #202124;
                 padding: 16px;
                 margin: 0;
-            }
-            h1, h2, h3, h4 {
+              }
+              h1, h2, h3, h4 {
                 font-weight: inherit;
                 margin: 0;
-            }
-            h1 {
+              }
+              h1 {
                 color: var(--purple);
-            }
-            a {
+              }
+              a {
                 color: var(--purple);
                 text-decoration: none;
-            }
-            header {
+              }
+              header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 padding-bottom: var(--padding);
                 border-bottom: 4px solid var(--green);
-            }
-            header img {
+              }
+              header img {
                 height: 50px;
-            }
-            header .date {
+              }
+              header .date {
                 margin-top: 4px;
                 opacity: 0.6;
-            }
-            .title {
+              }
+              .title {
                 color: var(--orange);
                 margin-top: calc(var(--padding) * 2);
-            }
-            .reportlink, .desc {
+              }
+              .reportlink, .desc {
                 font-size: 14px;
                 opacity: 0.6;
-            }
-            .reportlink {
+              }
+              .reportlink {
                 font-style: italic;
-            }
-            .desc {
+              }
+              .desc {
                 margin-bottom: var(--padding);
                 margin-top: 4px;
-            }
-            .screenshot {
+              }
+              .screenshot {
                 /*page-break-after: always;*/
-            }
-            .screenshot img {
+              }
+              .screenshot img {
                 max-width: 100%;
                 max-height: 90%;
                 border: 1px solid #eee;
-            }
+              }
             </style>
         </head>
         <body>
-            <header>
+          <header>
             <div>
-                <h1>Performance Tools Sandbox Report</h1>
-                <h4 class="date">Google I/O 2018 &middot; ${(new Date()).toLocaleDateString()}</h4>
+              <h1>Performance Tools Sandbox Report</h1>
+              <h4 class="date">Google I/O 2018 &middot; ${(new Date()).toLocaleDateString()}</h4>
             </div>
             <div>
                 <img src="https://storage.googleapis.com/io-2018.appspot.com/v1/hashtag.gif">
