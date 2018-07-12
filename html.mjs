@@ -21,11 +21,10 @@
  * @return {string} A link to the results.
 */
 export function getResultsLink(url) {
-  return (
-    `<p class="reportlink">
-        Results available at: <a href="${url}" target="_blank">${url}</a>
-    </p>`
-  );
+  return `
+  <p class="reportlink">
+    Results available at: <a href="${url}" target="_blank">${url}</a>
+  </p>`;
 }
 
 /**
@@ -36,19 +35,17 @@ export function getResultsLink(url) {
  * @return {string} A html template with meta-data.
  */
 export function createHTMLTemplate({name, desc, url}, resultsLink, screenshot) {
-  return (
-    `<h3 class="title">${name} results</h3>
-     <div>
-        <div class="desc">
-          About this tool: ${desc}
-          Learn more at <a href="${url}" target="_blank">${url}</a>
+  return `<h3 class="title">${name} results</h3>
+          <div>
+            <div class="desc">
+              About this tool: ${desc}
+              Learn more at <a href="${url}" target="_blank">${url}</a>
+            </div>
+            ${resultsLink}
         </div>
-        ${resultsLink}
-    </div>
-    <div class="screenshot">
-      <img src="data:img/png;base64,${screenshot.toString('base64')}">
-    </div>`
-  );
+        <div class="screenshot">
+          <img src="data:img/png;base64,${screenshot.toString('base64')}">
+        </div>`;
 }
 
 /**
@@ -57,89 +54,88 @@ export function createHTMLTemplate({name, desc, url}, resultsLink, screenshot) {
  * @return {string} Created html page.
  */
 export function createHTMLPage(content) {
-  return (
-    `<html>
-        <head>
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:300,400">
-            <style>
-              :root {
-                --orange: rgb(255, 108, 0);
-                --purple: #4768FD;
-                --yellow: #FCD230;
-                --green: #31E7B6;
-                --padding: 16px;
-              }
-              body {
-                /*background: url(https://storage.googleapis.com/io-2018.appspot.com/v1/hashtag.gif) no-repeat 100% 100%;
-                background-size: 25%;*/
-                font-family: 'Google Sans', 'Product Sans', sans-serif;
-                font-weight: 300;
-                color: #202124;
-                padding: 16px;
-                margin: 0;
-              }
-              h1, h2, h3, h4 {
-                font-weight: inherit;
-                margin: 0;
-              }
-              h1 {
-                color: var(--purple);
-              }
-              a {
-                color: var(--purple);
-                text-decoration: none;
-              }
-              header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding-bottom: var(--padding);
-                border-bottom: 4px solid var(--green);
-              }
-              header img {
-                height: 50px;
-              }
-              header .date {
-                margin-top: 4px;
-                opacity: 0.6;
-              }
-              .title {
-                color: var(--orange);
-                margin-top: calc(var(--padding) * 2);
-              }
-              .reportlink, .desc {
-                font-size: 14px;
-                opacity: 0.6;
-              }
-              .reportlink {
-                font-style: italic;
-              }
-              .desc {
-                margin-bottom: var(--padding);
-                margin-top: 4px;
-              }
-              .screenshot {
-                /*page-break-after: always;*/
-              }
-              .screenshot img {
-                max-width: 100%;
-                max-height: 90%;
-                border: 1px solid #eee;
-              }
-            </style>
-        </head>
-        <body>
-          <header>
-            <div>
-              <h1>Performance Tools Sandbox Report</h1>
-              <h4 class="date">Google I/O 2018 &middot; ${(new Date()).toLocaleDateString()}</h4>
-            </div>
-            <div>
-                <img src="https://storage.googleapis.com/io-2018.appspot.com/v1/hashtag.gif">
-            </div>
-            </header>
-            ${content}
-        </body>
-    </html>`
-  );
+  return `
+  <html>
+    <head>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:300,400">
+      <style>
+          :root {
+            --orange: rgb(255, 108, 0);
+            --purple: #4768FD;
+            --yellow: #FCD230;
+            --green: #31E7B6;
+            --padding: 16px;
+          }
+          body {
+            /*background: url(https://storage.googleapis.com/io-2018.appspot.com/v1/hashtag.gif) no-repeat 100% 100%;
+            background-size: 25%;*/
+            font-family: 'Google Sans', 'Product Sans', sans-serif;
+            font-weight: 300;
+            color: #202124;
+            padding: 16px;
+            margin: 0;
+          }
+          h1, h2, h3, h4 {
+            font-weight: inherit;
+            margin: 0;
+          }
+          h1 {
+            color: var(--purple);
+          }
+          a {
+            color: var(--purple);
+            text-decoration: none;
+          }
+          header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: var(--padding);
+            border-bottom: 4px solid var(--green);
+          }
+          header img {
+            height: 50px;
+          }
+          header .date {
+            margin-top: 4px;
+            opacity: 0.6;
+          }
+          .title {
+            color: var(--orange);
+            margin-top: calc(var(--padding) * 2);
+          }
+          .reportlink, .desc {
+            font-size: 14px;
+            opacity: 0.6;
+          }
+          .reportlink {
+            font-style: italic;
+          }
+          .desc {
+            margin-bottom: var(--padding);
+            margin-top: 4px;
+          }
+          .screenshot {
+            /*page-break-after: always;*/
+          }
+          .screenshot img {
+            max-width: 100%;
+            max-height: 90%;
+            border: 1px solid #eee;
+          }
+        </style>
+      </head>
+      <body>
+        <header>
+          <div>
+            <h1>Performance Tools Sandbox Report</h1>
+            <h4 class="date">Google I/O 2018 &middot; ${(new Date()).toLocaleDateString()}</h4>
+          </div>
+          <div>
+            <img src="https://storage.googleapis.com/io-2018.appspot.com/v1/hashtag.gif">
+          </div>
+        </header>
+        ${content}
+      </body>
+  </html>`;
 }
