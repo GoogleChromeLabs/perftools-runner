@@ -41,7 +41,7 @@ const firebaseApp = firebaseAdmin.initializeApp({
   storageBucket: CS_BUCKET,
 });
 const db = firebaseApp.firestore();
-
+db.settings({timestampsInSnapshots: true});
 
 const app = express();
 
@@ -166,10 +166,10 @@ function createHTML(results) {
         <header>
           <div>
             <h1>Performance Tools Sandbox Report</h1>
-            <h4 class="date">Google I/O 2018 &middot; ${(new Date()).toLocaleDateString()}</h4>
+            <h4 class="date">${(new Date()).toLocaleDateString()}</h4>
           </div>
           <div>
-            <img src="https://storage.googleapis.com/io-2018.appspot.com/v1/hashtag.gif">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png">
           </div>
         </header>
         ${body}

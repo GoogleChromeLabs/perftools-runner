@@ -21,6 +21,9 @@ When "Enter" is hit, this fires off a request o the `/run` handler. That handler
 
 The response is a JSON array of the tools that were run (e.g. `["LH", "PSI"]`).
 
+Note: every run of the tool logs the URL that was audited and tools to that were
+run to runs.txt.
+
 **Examples**
 
 Run Lighthouse and PSI against https://example.com:
