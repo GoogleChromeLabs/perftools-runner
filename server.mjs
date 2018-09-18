@@ -50,7 +50,7 @@ const catchAsyncErrors = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-// eslint-disable-next-line require-jsdoc
+// eslint-disable-next-line
 function errorHandler(err, req, res, next) {
   console.error(err.message);
   // if (res.headersSent) {
@@ -60,7 +60,7 @@ function errorHandler(err, req, res, next) {
     errors: `Error running your code. ${err}`,
   })}"\n\n`);
 
-  res.status(500).end();//send({errors: `Error running your code. ${err}`});
+  res.status(500).end(); // send({errors: `Error running your code. ${err}`});
 }
 
 /**
@@ -225,6 +225,7 @@ async function uploadPDF(pdfURL) {
     const parts = pdfURL.split('/');
     const filename = parts[parts.length - 1];
 
+    // eslint-disable-next-line
     const [file, response] = await bucket.upload(pdfURL, {
       public: true,
       gzip: true,

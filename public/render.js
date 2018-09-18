@@ -1,6 +1,6 @@
 import {html, render} from '../lit-html/lit-html.js';
-import {repeat} from '../lit-html/lib/repeat.js';
-import {unsafeHTML} from '../lit-html/lib/unsafe-html.js';
+import {repeat} from '../lit-html/directives/repeat.js';
+import {unsafeHTML} from '../lit-html/directives/unsafe-html.js';
 import {runners} from './tools.mjs';
 
 /**
@@ -61,7 +61,8 @@ function renderToolRunCompleteIcons(tools, container) {
  * @param {!HTMLElement} container
  */
 function renderToolReportLink(tool, container) {
-  const tmpl = html`<a href="${tool.resultsUrl || '#'}" target="report" title="Open ${tool.name} results">${tool.name}</a>`;
+  const tmpl = html`<a href="${tool.resultsUrl || '#'}" target="report"
+      title="Open ${tool.name} results">${tool.name}</a>`;
   render(tmpl, container);
 }
 

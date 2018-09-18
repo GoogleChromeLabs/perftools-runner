@@ -29,6 +29,10 @@
       white-space: nowrap;
       vertical-align: middle;
     }
+   .run-date {
+      display: inline-block;
+      width: 100px;
+    }
     .run-tools {
       display: inline-block;
       width: 110px;
@@ -85,17 +89,19 @@
   </div>
 </main>
 
-<script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
 <script src="gauge-element.js" type="module"></script>
 <script type="module">
 import {html, render} from '../lit-html/lit-html.js';
-import {repeat} from '../lit-html/lib/repeat.js';
+import {repeat} from '../lit-html/directives/repeat.js';
 
 (async() => {
 
 const runsContainer = document.querySelector('#runs');
 const numRuns = document.querySelector('#numruns');
+
+const dateStr = new URL(location).searchParams.get('since');
 
 firebase.initializeApp({
   apiKey: "AIzaSyB40db_e2H6wlB28PBeaS04JlVuL3OY-1U",
@@ -132,6 +138,7 @@ function renderGauges(lhScores, container) {
       return html`
         <li class="run">
           <a href="${doc.url}" class="run-link">${doc.url}</a>
+          <span class="run-date">${(new Date(doc.createdAt)).toJSON().split('T')[0]}</span>
           <span class="run-tools">( ${tools} )</span>
           <span class="run-lh-scores">${lhScores}</span>
         </li>`;
@@ -158,14 +165,25 @@ function renderGauges(lhScores, container) {
 
 function queryRuns(tool = null) {
   const query = tool ? collection.where(`tools.${tool}`, '==', true) : collection;
-  return query.orderBy('createdAt', 'desc');
+  let q = query.orderBy('createdAt', 'desc');
+  if (dateStr) {
+    q = q.where('createdAt', '>=', Date.parse(dateStr));
+  }
+  return q;
 }
 
 // Get entires with LH results.
 async function queryRunsWithLHResults() {
   const querySnapshot = await collection.where('lhr.accessibility', '>=', 0).get();
-  // Unique urls.
-  const results = unique(querySnapshot.docs.map(doc => doc.data()), 'url');
+  // Unique urls for LH averages and medians.
+  const results = unique(querySnapshot.docs
+    .map(doc => doc.data())
+    .filter(item => {
+      if (dateStr) {
+        return new Date(item.createdAt) >= new Date(dateStr) ? true : false;
+      }
+      return true;
+  }), 'url');
   let pwaScoreSum = 0;
   let perfScoreSum = 0;
   let a11yScoreSum = 0;

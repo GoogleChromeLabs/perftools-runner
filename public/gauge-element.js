@@ -92,7 +92,8 @@ tmpl.innerHTML = `
 <div class="lh-gauge__wrapper">
   <svg viewBox="0 0 120 120" class="lh-gauge" fill="none" stroke-width="2">
     <circle class="lh-gauge-base" r="53" cx="60" cy="60"></circle>
-    <circle class="lh-gauge-arc" transform="rotate(-90 60 60)" stroke-dasharray="0 329" stroke-dashoffset="0" r="53" cx="60" cy="60"></circle>
+    <circle class="lh-gauge-arc" transform="rotate(-90 60 60)"
+            stroke-dasharray="0 329" stroke-dashoffset="0" r="53" cx="60" cy="60"></circle>
   </svg>
   <h1 class="lh-gauge__percentage"></h1>
   <h2 class="lh-gauge__label"><slot></slot></h2>

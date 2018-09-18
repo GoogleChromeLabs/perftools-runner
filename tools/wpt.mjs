@@ -19,7 +19,7 @@ const {URL} = url;
 import fetch from 'node-fetch';
 import * as tools from '../public/tools.mjs';
 
-const API_KEY = '7dce091be3b64d95b7812bb5211ad5a9';//'A.04c7244ba25a5d6d717b0343a821aa59';
+const API_KEY = '7dce091be3b64d95b7812bb5211ad5a9'; // 'A.04c7244ba25a5d6d717b0343a821aa59';
 // const TOOL = tools.runners['WPT'];
 // const WPT_PR_MAP = new Map();
 
