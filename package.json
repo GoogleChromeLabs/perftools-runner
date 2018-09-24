@@ -13,7 +13,7 @@
     "lint": "./node_modules/eslint/bin/eslint.js --ext .js,.mjs .",
     "docker:build": "docker build -t webperfsandbox .",
     "docker:run": "docker run -it -p 8080:8080 --rm --name webperfsandbox --cap-add=SYS_ADMIN webperfsandbox",
-    "deploy": "gcloud app deploy . --project perf-sandbox"
+    "deploy": "gcloud app deploy . --project perf-sandbox --version cn"
   },
   "dependencies": {
     "@google-cloud/firestore": "^0.17.0",

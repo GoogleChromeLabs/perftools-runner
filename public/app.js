@@ -184,6 +184,7 @@ async function go(url) {
     const {viewURL} = await streamResults(runURL);
 
     viewAction.href = viewURL;
+
     document.body.classList.add('report');
     document.body.classList.remove('running');
 
