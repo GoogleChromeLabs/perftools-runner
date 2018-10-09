@@ -51,3 +51,8 @@ Lint:
 ```
 npm run lint
 ```
+
+For development, both `serviceAccount.json` and `bitlyAccount.json` are required. 
+
+- Follow instructions from [https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances#createanewserviceaccount](https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances#createanewserviceaccount) to get serviceAccount.json. 
+- Create an Bitly account from https://dev.bitly.com/my_apps.html and get access token for `bitlyAccount.json`.
