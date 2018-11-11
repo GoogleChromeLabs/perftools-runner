@@ -143,7 +143,7 @@ async function go(url) {
   url = url.trim();
 
   if (!url.match(/^https?:\/\//)) {
-    url = `http://${url}`;
+    url = `https://${url}`;
     input.value = url;
   }
 
